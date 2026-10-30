@@ -1,13 +1,9 @@
-"""Read-only command line probe for a Rohde & Schwarz EB200 receiver.
+"""Command line tools for a Rohde & Schwarz EB200 receiver.
 
-The probe talks TCP/SCPI straight to the instrument and records every
-exchange as raw bytes. It is intentionally self-contained: the ``eb200``
-driver core is added in the next phase, after which this module is reworked
-onto that API.
-
-Every subcommand is read-only by default. ``raw`` refuses commands that do
-not end in ``?`` (and any instrument reset/self-test) unless ``--unsafe`` is
-given explicitly.
+Everything except ``audio`` and ``raw`` without ``--unsafe`` is read-only.
+``audio`` briefly enables the undocumented UDP audio stream and always
+restores the receiver state afterwards. Every exchange can be recorded to a
+JSONL transcript (``--transcript`` or automatically for ``sweep``/``exp``).
 """
 
 from __future__ import annotations
@@ -16,12 +12,13 @@ import argparse
 import base64
 import datetime as dt
 import json
-import socket
 import sys
 import time
 from pathlib import Path
 
-from . import experiments
+from . import experiments, streams
+from .device import EB200
+from .transport import TCPTransport
 
 DEFAULT_HOST = "10.0.0.240"
 DEFAULT_PORT = 5555
@@ -29,6 +26,7 @@ CONNECT_TIMEOUT_S = 5.0
 RESPONSE_TIMEOUT_S = 2.0
 SWEEP_PAUSE_S = 0.15
 DEFAULT_CAPTURE_DIR = Path("tests/fixtures/capture")
+AUDIO_DEFAULT_MODE = 10  # 8 kHz, 16 bit, 1 channel
 
 FORBIDDEN_PREFIXES = ("*RST", "*TST")
 FORBIDDEN_HINT = "refusing non-query command; use --unsafe to override"
@@ -133,7 +131,7 @@ class Transcript:
 
 
 class ProbeLink:
-    """A single EB200 TCP connection that logs its own traffic."""
+    """Transcript-logging adapter over :class:`TCPTransport`."""
 
     def __init__(
         self,
@@ -142,118 +140,47 @@ class ProbeLink:
         timeout: float = RESPONSE_TIMEOUT_S,
         transcript: Transcript | None = None,
     ) -> None:
-        self._host = host
-        self._port = port
-        self._timeout = timeout
-        self._transcript = transcript
-        self._sock: socket.socket = socket.create_connection(
-            (host, port), timeout=CONNECT_TIMEOUT_S
-        )
-        self._sock.settimeout(timeout)
+        self.transcript = transcript
+        self._transport = TCPTransport(host, port, timeout=timeout)
+        self._transport.start()
 
     @property
-    def transcript(self) -> Transcript | None:
-        return self._transcript
+    def device(self) -> EB200:
+        return EB200(self._transport, registry_settle=0.3)
 
     @property
     def local_ip(self) -> str:
-        return self._sock.getsockname()[0]
+        return self._transport.local_ip
 
     def close(self) -> None:
-        self._sock.close()
-
-    def send_command(self, cmd: str) -> None:
-        payload = (cmd + "\n").encode("ascii")
-        if self._transcript is not None:
-            self._transcript.log("tx", cmd, payload)
-        self._sock.sendall(payload)
-
-    def read_response(self) -> bytes:
-        self._sock.settimeout(self._timeout)
-        try:
-            first = self._sock.recv(4096)
-        except TimeoutError:
-            raise TimeoutError(f"no response within {self._timeout}s") from None
-        if not first:
-            raise ConnectionError("connection closed by receiver")
-        if first.startswith(b"#"):
-            return self._read_block(first)
-        return self._read_line(first)
-
-    def _read_line(self, first: bytes) -> bytes:
-        buf = bytearray(first)
-        while True:
-            if buf.endswith(b"\r\n"):
-                return bytes(buf)
-            try:
-                chunk = self._sock.recv(4096)
-            except TimeoutError:
-                return bytes(buf)
-            if not chunk:
-                raise ConnectionError("connection closed by receiver")
-            buf += chunk
-
-    def _read_block(self, first: bytes) -> bytes:
-        """Read a definite-length block response (#<digits><len><payload>)."""
-        buf = bytearray(first)
-        if len(buf) < 2:
-            buf += self._recv_more()
-        count_digits = int(chr(buf[1]))
-        if count_digits == 0:
-            # Indefinite-length block: read until newline terminator.
-            while not buf.endswith(b"\n"):
-                buf += self._recv_more()
-            return bytes(buf[2:-1])
-        want = 2 + count_digits
-        while len(buf) < want:
-            buf += self._recv_more()
-        length = int(buf[2:want])
-        end = want + length
-        while len(buf) < end:
-            buf += self._recv_more()
-        return bytes(buf[want:end])
-
-    def _recv_more(self) -> bytes:
-        try:
-            chunk = self._sock.recv(4096)
-        except TimeoutError:
-            raise TimeoutError("response ended mid-block") from None
-        if not chunk:
-            raise ConnectionError("connection closed mid-response")
-        return chunk
+        self._transport.close()
 
     def query(self, cmd: str) -> bytes:
-        self.send_command(cmd)
-        data = self.read_response()
-        if self._transcript is not None:
-            self._transcript.log("rx", None, data)
+        self._log("tx", cmd, (cmd + "\n").encode("ascii"))
+        data = self._transport.query(cmd)
+        self._log("rx", None, data)
         return data
 
-    def issue(self, cmd: str, wait: float = 0.25) -> bytes:
-        """Send a set command and briefly collect any unexpected reply."""
-        self.send_command(cmd)
-        try:
-            data = self.read_response()
-        except TimeoutError:
-            data = b""
-        if self._transcript is not None:
-            self._transcript.log("rx", None, data, note="issue")
-        return data
+    def issue(self, cmd: str, wait: float = 0.0) -> bytes:
+        self._log("tx", cmd, (cmd + "\n").encode("ascii"))
+        self._transport.command(cmd)
+        return b""
 
     def query_errors(self, limit: int = 32) -> list[str]:
-        """Drain the SCPI error queue until it reports 'No error'."""
-        messages: list[str] = []
-        for _ in range(limit):
-            data = self.query("SYST:ERR?")
-            text = data.decode("ascii", "replace").rstrip()
-            messages.append(text)
-            if not text or text.startswith("0,"):
-                break
-        return messages
+        return [str(e) for e in self._transport.query_errors(limit)]
 
     def query_errors_clean(self) -> list[str]:
-        """Return only queued errors, ignoring the trailing 'No error'."""
-        return [m for m in self.query_errors() if m and not m.startswith("0,")]
+        return [e for e in self.query_errors() if not e.startswith("0,")]
+
+    def _log(
+        self,
+        kind: str,
+        cmd: str | None,
+        data: bytes,
+        note: str | None = None,
+    ) -> None:
+        if self.transcript is not None:
+            self.transcript.log(kind, cmd, data, note=note)
 
 
 def run_sweep(link: ProbeLink, pause: float = SWEEP_PAUSE_S) -> None:
@@ -262,9 +189,9 @@ def run_sweep(link: ProbeLink, pause: float = SWEEP_PAUSE_S) -> None:
         try:
             data = link.query(cmd)
             shown: object = data
-        except TimeoutError:
+        except Exception as exc:  # noqa: BLE001 - report and continue
             data = b""
-            shown = b"<timeout>"
+            shown = f"<{type(exc).__name__}: {exc}>"
         errors = link.query_errors_clean()
         print(f"{cmd:36} -> {shown!r}")
         for err in errors:
@@ -293,12 +220,12 @@ def cmd_options(link: ProbeLink, _args: argparse.Namespace) -> None:
 
 
 def cmd_rx(link: ProbeLink, _args: argparse.Namespace) -> None:
-    rows = []
+    rows: list[tuple[str, bytes]] = []
     for label, cmd in RX_QUERIES:
         try:
             rows.append((label, link.query(cmd)))
-        except TimeoutError:
-            rows.append((label, b"<timeout>"))
+        except Exception as exc:  # noqa: BLE001 - show and continue
+            rows.append((label, f"<{type(exc).__name__}>".encode()))
         link.query_errors_clean()
     _print_labelled(rows)
 
@@ -312,8 +239,8 @@ def cmd_traces(link: ProbeLink, _args: argparse.Namespace) -> None:
             continue
         try:
             print(f"points {name:10}: {link.query(f'TRACe:POINts? {name}')!r}")
-        except TimeoutError:
-            print(f"points {name:10}: <timeout>")
+        except Exception as exc:  # noqa: BLE001
+            print(f"points {name:10}: <{type(exc).__name__}: {exc}>")
 
 
 def cmd_udp(link: ProbeLink, _args: argparse.Namespace) -> None:
@@ -329,7 +256,7 @@ def cmd_errors(link: ProbeLink, _args: argparse.Namespace) -> None:
         print(msg)
 
 
-def cmd_raw(args: argparse.Namespace, link: ProbeLink) -> None:
+def cmd_raw(link: ProbeLink, args: argparse.Namespace) -> None:
     cmd = args.cmd.strip()
     lowered = cmd.lower()
     if any(lowered.startswith(p.lower()) for p in FORBIDDEN_PREFIXES):
@@ -343,29 +270,69 @@ def cmd_raw(args: argparse.Namespace, link: ProbeLink) -> None:
         raise SystemExit(2)
     data = link.query(cmd)
     print(repr(data))
-    errors = link.query_errors_clean()
-    for err in errors:
+    for err in link.query_errors_clean():
         print(f"error: {err}")
 
 
 def cmd_sweep(link: ProbeLink, args: argparse.Namespace) -> None:
     if link.transcript is None:
-        link._transcript = Transcript.create(args.capture_dir, "sweep")
+        link.transcript = Transcript.create(args.capture_dir, "sweep")
         print(f"transcript: {link.transcript.path}")
     run_sweep(link)
 
 
 def cmd_exp(link: ProbeLink, args: argparse.Namespace) -> None:
     if link.transcript is None:
-        link._transcript = Transcript.create(args.capture_dir, "exp")
+        link.transcript = Transcript.create(args.capture_dir, "exp")
         print(f"transcript: {link.transcript.path}")
     experiments.run(link, args.name, args.duration)
+
+
+def cmd_audio(link: ProbeLink, args: argparse.Namespace) -> None:
+    """Enable the UDP audio stream briefly, print stats, restore state."""
+    device = link.device
+    receiver = streams.AudioReceiver()
+    orig_mode = device.remote_af_mode()
+    orig_registry = device.udp_registry()
+    print(f"remote AF mode: {orig_mode}; registry: {orig_registry!r}")
+    receiver.start()
+    ip = link.local_ip
+    try:
+        device.udp_register(ip, receiver.port, "AUDIO")
+        device.set_remote_af_mode(AUDIO_DEFAULT_MODE)
+        deadline = time.monotonic() + args.duration
+        while time.monotonic() < deadline:
+            receiver.read(8_000)
+            time.sleep(0.25)
+        stats = receiver.stats()
+        print(
+            f"audio stats {args.duration}s: packets={stats['packets']} "
+            f"lost={stats['lost']} duplicates={stats['duplicates']} "
+            f"errors={stats['parse_errors']} samples={stats['samples']}"
+        )
+        if stats["packets"] == 0:
+            print(
+                "no datagrams received; check the ufw rule for UDP from the "
+                "receiver (docs/protocol-notes.md, host-side note)"
+            )
+    finally:
+        try:
+            device.set_remote_af_mode(orig_mode)
+        finally:
+            try:
+                device.udp_clear(ip)
+            finally:
+                receiver.stop()
+        print(
+            f"restored: mode={device.remote_af_mode()} "
+            f"registry={device.udp_registry()!r}"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="eb200-probe",
-        description=("Read-only discovery probe for a Rohde & Schwarz EB200 receiver"),
+        description="Discovery probe and audio listener for the R&S EB200",
     )
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
@@ -399,6 +366,12 @@ def build_parser() -> argparse.ArgumentParser:
     exp.add_argument("--duration", type=float, default=3.0)
     exp.add_argument("--capture-dir", type=Path, default=DEFAULT_CAPTURE_DIR)
     exp.set_defaults(func=cmd_exp)
+
+    audio = sub.add_parser(
+        "audio", help="listen to the UDP audio stream briefly (restores state)"
+    )
+    audio.add_argument("--duration", type=float, default=3.0)
+    audio.set_defaults(func=cmd_audio)
 
     return parser
 

@@ -92,10 +92,10 @@ in phase 5 before trusting either number.
   (`-141`), `SYST:IF:REM:MODE` undefined (`-113`), `…FLAG:ON …,"PRIVATE"`
   rejected (`-151`). The `…:DEFAULT:…` command forms used by weakmon are
   also undefined on 2.80.
-- Deregistration: `TRACE:UDP:TAG:OFF "<ip>",<port>,<TAG>` followed by
-  `TRACE:UDP:DELETE "<ip>",<port>` (exactly two arguments). Registry changes
-  apply asynchronously (≈ 0.2 s) — an immediate re-query can still show the
-  old list.
+- Deregistration is a repeated `TRACE:UDP:DELETE` (one entry per call);
+  `TAG:OFF` only detaches a tag and actually *creates* a destination entry —
+  full details in `protocol-notes.md`.
+- Deregistration is asynchronous as well (~0.2 s); verification must wait.
 
 ### Trace subsystem (documented, verified idle)
 
