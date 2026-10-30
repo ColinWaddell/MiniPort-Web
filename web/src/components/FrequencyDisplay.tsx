@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReceiverState } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   state: ReceiverState;
@@ -81,7 +82,7 @@ export function FrequencyDisplay({
       </div>
       <div className="freq-meta">
         <label>
-          OPERATION{" "}
+          <HelpTip term="operation">OPERATION</HelpTip>{" "}
           <select
             value={state.freq_mode}
             disabled={!controllable}

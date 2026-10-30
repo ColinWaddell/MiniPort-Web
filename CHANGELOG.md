@@ -3,6 +3,26 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.0] - 2026-10-30
+
+### Added
+
+- In-interface help, written for this receiver: dotted-underlined jargon
+  words (MGC, RF ATTENUATOR, AFC, THRESHOLD, OPERATION, IF BANDWIDTH,
+  DEMODULATOR, SPAN/STEP chips, DISPLAY dBµV range, SIGNAL LEVEL, panel
+  headings …) with hover bubbles explaining the control, its unit and
+  range, and quirks verified on the instrument.
+- A `?` button in the header opens a full reference sheet: one scrollable
+  card grouped per panel (every control explained, touch-friendly),
+  closable with Esc/outside click.
+- 10 px spacing between the waterfall and the buttons beneath it.
+
+### Verified
+
+- Browser E2E on both origins (localhost and the LAN IP / non-secure
+  context): hover bubbles appear, the reference sheet opens and closes,
+  waterfall spacing = 10 px, no page errors.
+
 ## [0.7.2] - 2026-10-30
 
 ### Fixed

@@ -7,6 +7,7 @@ import {
   topPeak,
 } from "../lib/spectrum";
 import type { Preset, SpectrumStatus } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   connected: boolean;
@@ -212,7 +213,7 @@ export function SpectrumPanel({
   return (
     <div className="panel-body">
       <h2>
-        LIVE SPECTRUM / WATERFALL{" "}
+        <HelpTip term="spectrum">LIVE SPECTRUM / WATERFALL</HelpTip>{" "}
         {running ? (
           <span className="scan-flag">· RUNNING ({status.cycles ?? 0} cycles)</span>
         ) : null}
@@ -254,7 +255,7 @@ export function SpectrumPanel({
           disabled={!canStop}
           onClick={() => api.spectrumResetPeak().catch((error) => setApiError(error.message))}
         >
-          RESET PEAK
+          <HelpTip term="reset_peak">RESET PEAK</HelpTip>
         </button>
         <a className="link" href="api/spectrum/export.csv" download>
           export CSV
@@ -295,7 +296,7 @@ export function SpectrumPanel({
         <button onClick={savePng}>SAVE PNG</button>
       </div>
       <div className="field-row">
-        <span className="chips-label">SPAN</span>
+        <span className="chips-label"><HelpTip term="span_chips">SPAN</HelpTip></span>
         <div className="chips">
           {SPAN_CHIPS.map(([label, span]) => (
             <button
@@ -308,7 +309,7 @@ export function SpectrumPanel({
             </button>
           ))}
         </div>
-        <span className="chips-label">STEP</span>
+        <span className="chips-label"><HelpTip term="step_chips">STEP</HelpTip></span>
         <div className="chips">
           {STEP_CHIPS.map(([label, hz]) => (
             <button
@@ -324,7 +325,7 @@ export function SpectrumPanel({
       </div>
       <div className="field-row">
         <label>
-          DISPLAY dBµV MIN
+          <HelpTip term="display_range">DISPLAY dBµV MIN</HelpTip>
           <input type="number" value={dbMin} onChange={(ev) => setDbMin(Number(ev.target.value))} />
         </label>
         <label>

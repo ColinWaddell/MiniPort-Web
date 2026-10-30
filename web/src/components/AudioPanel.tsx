@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { AudioStreamer, type StreamerStatus } from "../lib/audio-streamer";
 import type { AudioStatus, Recording } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   connected: boolean;
@@ -93,7 +94,8 @@ export function AudioPanel({ connected, ownsControl, status }: Props) {
   return (
     <div className="panel-body">
       <h2>
-        REMOTE AUDIO {status.running ? <span className="scan-flag">· STREAMING</span> : null}
+        <HelpTip term="listen">REMOTE AUDIO</HelpTip>{" "}
+        {status.running ? <span className="scan-flag">· STREAMING</span> : null}
         {status.recording ? <span className="rec-flag"> · REC</span> : null}
       </h2>
       <div className="field-row">
@@ -154,7 +156,7 @@ export function AudioPanel({ connected, ownsControl, status }: Props) {
           <span>⚠ {error}</span>
         </div>
       ) : null}
-      <h2>RECORDINGS</h2>
+      <h2><HelpTip term="recordings">RECORDINGS</HelpTip></h2>
       {recordings.length === 0 ? (
         <div className="scan-empty">No recordings yet.</div>
       ) : (

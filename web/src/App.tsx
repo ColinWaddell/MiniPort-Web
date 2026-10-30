@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Header } from "./components/Header";
+import { HelpSheet } from "./components/help";
 import { FrequencyDisplay } from "./components/FrequencyDisplay";
 import { LevelMeter } from "./components/LevelMeter";
 import { ModePanel } from "./components/ModePanel";
@@ -21,6 +22,7 @@ export function App() {
   const [ownsControl, setOwnsControl] = useState(false);
   const [controlNote, setControlNote] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     fetchCapabilities()
@@ -75,7 +77,9 @@ export function App() {
         ownsControl={ownsControl}
         controlNote={controlNote}
         onTakeControl={takeControl}
+        onHelp={() => setHelpOpen(true)}
       />
+      {helpOpen ? <HelpSheet onClose={() => setHelpOpen(false)} /> : null}
       {snapshot?.error ? (
         <ErrorBanner
           text={snapshot.error}
@@ -179,7 +183,7 @@ export function App() {
         </div>
       )}
       <footer className="footer">
-        client {clientId().slice(0, 8)} · MiniPort-Web 0.7.2
+        client {clientId().slice(0, 8)} · MiniPort-Web 0.8.0
       </footer>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { ReceiverState } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   state: ReceiverState;
@@ -15,7 +16,7 @@ export function SquelchPanel({
 }: Props) {
   return (
     <div className="panel-body">
-      <h2>SQUELCH</h2>
+      <h2><HelpTip term="squelch">SQUELCH</HelpTip></h2>
       <div className="field-row">
         <button
           className={`switch ${state.squelch ? "on" : ""}`}

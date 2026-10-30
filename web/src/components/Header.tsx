@@ -1,5 +1,6 @@
 import type { DeviceInfo } from "../lib/types";
 import type { LinkStatus } from "../lib/useReceiver";
+import { HelpButton } from "./help";
 
 interface Props {
   device: DeviceInfo | null;
@@ -8,6 +9,7 @@ interface Props {
   ownsControl: boolean;
   controlNote: string | null;
   onTakeControl: () => void;
+  onHelp: () => void;
 }
 
 export function Header({
@@ -17,6 +19,7 @@ export function Header({
   ownsControl,
   controlNote,
   onTakeControl,
+  onHelp,
 }: Props) {
   const linkTone = connected ? "ok" : ws === "down" ? "bad" : "warn";
   const linkText = connected
@@ -46,6 +49,7 @@ export function Header({
             {controlNote ? "take control (busy)" : "take control"}
           </button>
         )}
+        <HelpButton onOpen={onHelp} />
       </div>
     </header>
   );
