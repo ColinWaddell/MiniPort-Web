@@ -3,6 +3,7 @@ import { api, clientId } from "../lib/api";
 import {
   decodeSpectrumFrame,
   levelToColor,
+  WaterfallNormalizer,
   type SpectrumFrame,
   topPeak,
 } from "../lib/spectrum";
@@ -53,6 +54,14 @@ export function SpectrumPanel({
   const [frozen, setFrozen] = useState(false);
   const [showPeak, setShowPeak] = useState(true);
   const [showWaterfall, setShowWaterfall] = useState(true);
+  const [autoWaterfall, setAutoWaterfall] = useState(
+    () => localStorage.getItem("miniport-wf-auto") !== "0",
+  );
+  const [sensitivity, setSensitivity] = useState(() => {
+    const stored = Number(localStorage.getItem("miniport-wf-sens"));
+    return Number.isFinite(stored) && stored >= 0 && stored <= 100 ? stored : 50;
+  });
+  const [computedRange, setComputedRange] = useState<{ min: number; max: number } | null>(null);
 
   const spectrumCanvas = useRef<HTMLCanvasElement | null>(null);
   const waterfallCanvas = useRef<HTMLCanvasElement | null>(null);
@@ -61,6 +70,10 @@ export function SpectrumPanel({
   const frozenRef = useRef(false);
   const showPeakRef = useRef(true);
   const showWaterfallRef = useRef(true);
+  const autoRef = useRef(autoWaterfall);
+  const sensitivityRef = useRef(sensitivity);
+  const normalizerRef = useRef(new WaterfallNormalizer());
+  const bandKeyRef = useRef<string | null>(null);
   const running = status.running;
   const controllable = connected && ownsControl && !scanning;
   const canStop = connected && ownsControl && running;
@@ -68,6 +81,22 @@ export function SpectrumPanel({
   useEffect(() => {
     frozenRef.current = frozen;
   }, [frozen]);
+  useEffect(() => {
+    autoRef.current = autoWaterfall;
+    try {
+      localStorage.setItem("miniport-wf-auto", autoWaterfall ? "1" : "0");
+    } catch {
+      /* private mode: in-memory only */
+    }
+  }, [autoWaterfall]);
+  useEffect(() => {
+    sensitivityRef.current = sensitivity;
+    try {
+      localStorage.setItem("miniport-wf-sens", String(sensitivity));
+    } catch {
+      /* private mode */
+    }
+  }, [sensitivity]);
   useEffect(() => {
     showPeakRef.current = showPeak;
   }, [showPeak]);
@@ -105,6 +134,15 @@ export function SpectrumPanel({
         if (!(ev.data instanceof ArrayBuffer)) return;
         const frame = decodeSpectrumFrame(ev.data);
         if (!frame) return;
+        const bandKey = `${frame.startHz}/${frame.stepHz}/${frame.points}`;
+        if (bandKeyRef.current === null) {
+          bandKeyRef.current = bandKey;
+        } else if (bandKeyRef.current !== bandKey) {
+          // the swept band changed: forget the old level distribution
+          bandKeyRef.current = bandKey;
+          normalizerRef.current.reset();
+        }
+        normalizerRef.current.push(frame.levels);
         frameRef.current = frame;
         const peak = frame.peak ?? frame.levels;
         const top = topPeak(peak, frame.startHz, frame.stepHz);
@@ -134,9 +172,24 @@ export function SpectrumPanel({
     const spectrum = spectrumCanvas.current;
     const waterfall = waterfallCanvas.current;
     if (!frame || !spectrum || !waterfall) return;
-    const { min, max } = scaleRef.current;
-    drawSpectrum(spectrum, frame, min, max, showPeakRef.current);
-    if (showWaterfallRef.current) appendWaterfall(waterfall, frame, min, max);
+    const { min: traceMin, max: traceMax } = scaleRef.current;
+    drawSpectrum(spectrum, frame, traceMin, traceMax, showPeakRef.current);
+    let wfMin = scaleRef.current.min;
+    let wfMax = scaleRef.current.max;
+    if (autoRef.current) {
+      const range = normalizerRef.current.range(sensitivityRef.current);
+      if (range) {
+        wfMin = range.min;
+        wfMax = range.max;
+        const rounded = { min: Math.round(range.min), max: Math.round(range.max) };
+        setComputedRange((previous) =>
+          previous && previous.min === rounded.min && previous.max === rounded.max
+            ? previous
+            : rounded,
+        );
+      }
+    }
+    if (showWaterfallRef.current) appendWaterfall(waterfall, frame, wfMin, wfMax);
   }, []);
 
   const clearWaterfall = () => {
@@ -324,13 +377,42 @@ export function SpectrumPanel({
         </div>
       </div>
       <div className="field-row">
+        <button
+          className={`switch ${autoWaterfall ? "on" : ""}`}
+          aria-pressed={autoWaterfall}
+          onClick={() => setAutoWaterfall(!autoWaterfall)}
+        >
+          AUTO WATERFALL {autoWaterfall ? "ON" : "OFF"}
+        </button>
+        <label className="slider">
+          <HelpTip term="sensitivity">SENSITIVITY</HelpTip>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={sensitivity}
+            disabled={!autoWaterfall}
+            onChange={(ev) => setSensitivity(Number.parseInt(ev.target.value, 10))}
+          />
+        </label>
         <label>
           <HelpTip term="display_range">DISPLAY dBµV MIN</HelpTip>
-          <input type="number" value={dbMin} onChange={(ev) => setDbMin(Number(ev.target.value))} />
+          <input
+            type="number"
+            value={autoWaterfall ? (computedRange ? computedRange.min : dbMin) : dbMin}
+            disabled={autoWaterfall}
+            onChange={(ev) => setDbMin(Number(ev.target.value))}
+          />
         </label>
         <label>
           DISPLAY dBµV MAX
-          <input type="number" value={dbMax} onChange={(ev) => setDbMax(Number(ev.target.value))} />
+          <input
+            type="number"
+            value={autoWaterfall ? (computedRange ? computedRange.max : dbMax) : dbMax}
+            disabled={autoWaterfall}
+            onChange={(ev) => setDbMax(Number(ev.target.value))}
+          />
         </label>
         <label>
           PRESET

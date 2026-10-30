@@ -89,3 +89,74 @@ export function topPeak(
   });
   return best;
 }
+
+/// Self-normalizing palette range for the waterfall.
+///
+/// Percentile stretch over a rolling window of recent frames: each frame
+/// contributes its 5/50/95th percentiles of level; the palette range comes
+/// from the window medians, tightened or widened by the sensitivity value
+/// (0–100, 50 = neutral 5/95 stretch). Band changes reset the window so the
+/// range re-adapts to the new level distribution instead of mixing bands.
+export class WaterfallNormalizer {
+  private frames: { min: number; p05: number; p50: number; p95: number; max: number }[] = [];
+  private capacity = 60;
+
+  push(levels: (number | null)[]): void {
+    const values = levels
+      .filter((level): level is number => level !== null)
+      .sort((a, b) => a - b);
+    if (values.length < 8) return; // too little data for percentiles
+    const pick = (p: number) => values[Math.min(values.length - 1, Math.floor(p * values.length))];
+    this.frames.push({
+      min: values[0],
+      p05: pick(0.05),
+      p50: pick(0.5),
+      p95: pick(0.95),
+      max: values[values.length - 1],
+    });
+    if (this.frames.length > this.capacity) this.frames.shift();
+  }
+
+  /// e.g. a band change: forget the old level distribution entirely.
+  reset(): void {
+    this.frames = [];
+  }
+
+  /// Palette range in dBµV, or null until ~3 frames have arrived.
+  range(sensitivity: number): { min: number; max: number } | null {
+    if (this.frames.length < 3) return null;
+    const clamp01 = Math.min(Math.max(sensitivity / 100, 0), 1);
+    const t = clamp01 * 2 - 1; // -1..1 (50 = neutral)
+
+    const median = (pick: (f: Frame) => number) => {
+      const values = this.frames.map(pick).sort((a, b) => a - b);
+      return values[Math.floor(values.length / 2)];
+    };
+    const p05 = median((f) => f.p05);
+    const p50 = median((f) => f.p50);
+    const p95 = median((f) => f.p95);
+    const winMin = median((f) => f.min);
+    const winMax = median((f) => f.max);
+
+    const span = Math.max(p95 - p05, 1);
+    let min: number;
+    let max: number;
+    if (t >= 0) {
+      // tighten toward the median: faint signals pop, noise amplifies
+      min = p05 + (p50 - p05) * t * 0.9;
+      max = p95 - (p95 - p50) * t * 0.9;
+    } else {
+      // widen toward the observed extremes: calmer, more headroom
+      min = p05 - span * -t * 0.5;
+      max = p95 + span * -t * 0.5;
+      min = Math.max(min, winMin);
+      max = Math.min(max, winMax);
+    }
+    if (max - min < 1) {
+      max = min + 1;
+    }
+    return { min, max };
+  }
+}
+
+type Frame = { min: number; p05: number; p50: number; p95: number; max: number };

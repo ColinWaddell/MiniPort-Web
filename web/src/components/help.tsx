@@ -50,7 +50,7 @@ export const TIPS: Record<string, string> = {
     "Recentre the sweep band on the receiver's current tune with that total width.",
   step_chips: "Set the sweep step quickly.",
   display_range:
-    "Vertical scale of the spectrum trace and the colour mapping of the waterfall (dBµV).",
+    "Vertical scale of the spectrum trace (dBµV) — always an absolute, trustworthy level reading. In MANUAL it also sets the waterfall colours; with AUTO WATERFALL on, the inputs instead show the live computed colour range.",
   presets:
     "Named band configurations stored in the server's database; load one to re-fill START/STOP/STEP.",
   trigger:
@@ -64,6 +64,10 @@ export const TIPS: Record<string, string> = {
     "Sweep cycles saved by scheduled jobs; each can be exported as CSV (frequency × level).",
   connection:
     "Link state between the server and the EB200. The browser keeps working while it is down; nothing is lost except live data.",
+  auto_waterfall:
+    "Self-normalizing waterfall: the colour range spans the rolling 5th–95th percentile of received levels, so the noise floor expands and faint signals become visible. The window rebuilds whenever the sweep band changes.",
+  sensitivity:
+    "Tightens (higher) or widens (lower) the normalizer's window around the median level: higher makes faint signals pop but amplifies noise too; 50 is neutral.",
 };
 
 export interface PanelHelp {
@@ -142,6 +146,8 @@ export const PANEL_HELP: PanelHelp[] = [
       { term: "WATERFALL", text: TIPS.waterfall },
       { term: "SPAN chips", text: TIPS.span_chips },
       { term: "STEP chips", text: TIPS.step_chips },
+      { term: "AUTO WATERFALL", text: TIPS.auto_waterfall },
+      { term: "SENSITIVITY", text: TIPS.sensitivity },
       { term: "DISPLAY dBµV range", text: TIPS.display_range },
       { term: "SAVE/CLEAR/FREEZE", text: "Display-only actions: PNG export, waterfall clear, frozen picture — they never touch the receiver." },
       { term: "PRESETS", text: TIPS.presets },

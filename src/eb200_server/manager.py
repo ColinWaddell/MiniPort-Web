@@ -524,14 +524,20 @@ class ReceiverManager:
                 self._clients.pop(ws, None)
 
     async def _safe_send(self, ws: object, send, *args) -> bool:
-        """Send with a hard timeout; dead peers must never stall producers."""
+        """Send with a hard timeout; dead peers must never stall producers.
+
+        The close() attempt is bounded too: starlette's close performs a
+        graceful close-frame handshake, which can hang forever on a
+        half-dead TCP socket (e.g. a crashed browser process) — and a hang
+        here would stop every broadcast to every client.
+        """
         try:
             await asyncio.wait_for(send(*args), timeout=2.0)
             return True
         except Exception:  # noqa: BLE001 - prune on failure or hang
             try:
-                await ws.close()
-            except Exception:  # noqa: BLE001
+                await asyncio.wait_for(ws.close(), timeout=1.0)
+            except Exception:  # noqa: BLE001 - give up; the socket is dead
                 pass
             return False
 
