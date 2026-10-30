@@ -12,12 +12,20 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import (
+    FastAPI,
+    Header,
+    HTTPException,
+    Response,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from eb200.errors import EB200Error
 from eb200_server.manager import CAPABILITIES, ControlBusy, ReceiverManager
+from eb200_server.spectrum import SpectrumParams
 
 log = logging.getLogger(__name__)
 
@@ -64,6 +72,33 @@ class ScanRequest(BaseModel):
     stop_hz: int = Field(ge=0)
     step_hz: int = Field(gt=0)
     timeout: float = Field(default=30.0, gt=0.0, le=120.0)
+
+
+class SpectrumStartRequest(BaseModel):
+    start_hz: int = Field(ge=0)
+    stop_hz: int = Field(ge=0)
+    step_hz: int = Field(gt=0)
+
+
+class PresetCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    start_hz: int = Field(ge=0)
+    stop_hz: int = Field(ge=0)
+    step_hz: int = Field(gt=0)
+
+
+async def _control_call(coro) -> dict:
+    """Shared error mapping for control-ish calls."""
+    try:
+        return await coro
+    except ControlBusy as exc:
+        raise HTTPException(409, str(exc)) from None
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from None
+    except EB200Error as exc:
+        raise HTTPException(502, f"receiver reported: {exc}") from None
+    except OSError as exc:
+        raise HTTPException(503, f"receiver error: {exc}") from None
 
 
 async def _apply_set(
@@ -248,6 +283,85 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
             pass
         finally:
             manager.websocket_leave(ws)
+
+    @app.post("/api/spectrum/start")
+    async def spectrum_start(
+        request: SpectrumStartRequest, x_eb200_client: str = Header(None)
+    ) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        params = SpectrumParams(request.start_hz, request.stop_hz, request.step_hz)
+        return await _control_call(manager.spectrum_start(x_eb200_client, params))
+
+    @app.post("/api/spectrum/stop")
+    async def spectrum_stop(x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        return await _control_call(manager.spectrum_stop(x_eb200_client))
+
+    @app.post("/api/spectrum/reset-peak")
+    async def spectrum_reset_peak(x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        return await _control_call(manager.spectrum_reset_peak(x_eb200_client))
+
+    @app.get("/api/spectrum/export.csv")
+    async def spectrum_export_csv() -> Response:
+        try:
+            content = manager.spectrum_csv()
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+        return Response(
+            content,
+            media_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="spectrum.csv"'},
+        )
+
+    @app.get("/api/spectrum/presets")
+    async def preset_list() -> dict:
+        return {"presets": manager.preset_list()}
+
+    @app.post("/api/spectrum/presets")
+    async def preset_create(
+        request: PresetCreateRequest, x_eb200_client: str = Header(None)
+    ) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        params = SpectrumParams(request.start_hz, request.stop_hz, request.step_hz)
+        try:
+            result = manager.preset_add(x_eb200_client, request.name, params)
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+        return {"preset": result}
+
+    @app.delete("/api/spectrum/presets/{preset_id}")
+    async def preset_delete(preset_id: int, x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        try:
+            deleted = manager.preset_delete(x_eb200_client, preset_id)
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        if not deleted:
+            raise HTTPException(404, f"preset {preset_id} not found")
+        return {"deleted": True}
+
+    @app.websocket("/ws/spectrum")
+    async def spectrum_socket(ws: WebSocket, client_id: str = ""):
+        await ws.accept()
+        manager.spectrum_join(ws, client_id)
+        await ws.send_json({"type": "spectrum-config", **manager.spectrum_status()})
+        try:
+            while True:
+                message = await ws.receive_json()
+                if message.get("type") == "hb":
+                    manager.note_activity(ws)
+        except WebSocketDisconnect:
+            pass
+        finally:
+            manager.spectrum_leave(ws)
 
     _mount_frontend(app)
     return app

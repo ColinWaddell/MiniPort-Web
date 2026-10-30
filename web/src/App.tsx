@@ -7,6 +7,7 @@ import { GainPanel } from "./components/GainPanel";
 import { SquelchPanel } from "./components/SquelchPanel";
 import { VolumePanel } from "./components/VolumePanel";
 import { ScanPanel } from "./components/ScanPanel";
+import { SpectrumPanel } from "./components/SpectrumPanel";
 import { ErrorBanner } from "./components/ErrorBanner";
 import { api, clientId, fetchCapabilities } from "./lib/api";
 import { useReceiver } from "./lib/useReceiver";
@@ -137,6 +138,14 @@ export function App() {
               state={state}
               controllable={controllable}
               onVolume={(value) => apply(() => api.setVolume(value))}
+            />
+          </section>
+          <section className="panel panel-wide">
+            <SpectrumPanel
+              connected={connected}
+              ownsControl={ownsControl}
+              scanning={snapshot?.scanning ?? false}
+              status={snapshot?.spectrum ?? { running: false }}
             />
           </section>
           <section className="panel panel-wide">

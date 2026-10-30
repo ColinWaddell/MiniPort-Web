@@ -3,6 +3,34 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-10-30
+
+### Added
+
+- `SpectrumService` (`src/eb200_server/spectrum.py`): continuous
+  documented sweep cycles over the trace-buffer path, per-bin peak hold,
+  frame history, and an efficient binary WebSocket protocol (`SPW1`:
+  little-endian header + int16 levels/peak in 1/10 dBµV, NaN sentinel) so
+  payload size scales with the grid, not with JSON overhead.
+- REST: `/api/spectrum/start|stop|reset-peak`, `/api/spectrum/export.csv`
+  (waterfall history as CSV: timestamp × frequency grid), preset store
+  (`/api/spectrum/presets` GET/POST/DELETE, JSON file in `data/`, gitignored)
+  with validation (≤ 2001 points).
+- New WebSocket `/ws/spectrum` streaming binary frames to any number of
+  viewers; spectrum runs hold the receiver lock and block competing
+  control ops with a 409 guard; state snapshots carry `spectrum` status and
+  keep last-known connectivity while sweeping.
+- `SpectrumPanel` in the frontend: canvas spectrum with grid, axis labels,
+  trace, dashed peak-hold line and peak marker; canvas waterfall with
+  four-stop palette and adjustable display range; start/stop, peak reset,
+  preset save/load/delete and CSV export. Frequency header offsets, water-
+  fall row model and the STOP button availability were fixed during live
+  E2E.
+- `StatefulTransport` now emulates one-cycle sweeps (deterministic
+  synthetic band with a centre carrier), enabling end-to-end spectrum
+  service tests without hardware; fault injection reaches it too.
+- Gated live tests: spectrum cycles, CSV shape, preset lifecycle.
+
 ## [0.3.0] - 2026-10-30
 
 ### Added
