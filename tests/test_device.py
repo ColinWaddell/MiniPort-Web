@@ -1,9 +1,11 @@
 """Device facade tests against the simulated transport."""
 
+import math
+
 import pytest
 
 from eb200.device import EB200
-from eb200.errors import EB200Protocol, SCPIError
+from eb200.errors import EB200Protocol, EB200Timeout, SCPIError
 
 
 def test_identify(device: EB200):
@@ -133,6 +135,116 @@ def test_udp_clear_deletes_each_entry_once(sim):
     removed = receiver.udp_clear("10.0.0.35")
     assert removed == 1
     assert 'TRACE:UDP:DELETE "10.0.0.35",50000' in sim.queries_sent()
+
+
+def test_gain_getters_and_commands(device: EB200, sim):
+    assert device.gain() == 50.0
+    assert device.gain_mode() == "AUTO"
+    device.set_gain(70)
+    device.set_gain_mode("FIXed")
+    device.set_gain_mode("auto")  # case-insensitive canonicalisation
+    sent = sim.queries_sent()
+    assert "GCON 70" in sent
+    assert "GCON:MODE FIXed" in sent
+    assert "GCON:MODE AUTO" in sent
+
+
+def test_gain_validation(device: EB200):
+    with pytest.raises(ValueError):
+        device.set_gain(200)
+    with pytest.raises(ValueError):
+        device.set_gain(-31)
+    with pytest.raises(ValueError):
+        device.set_gain_mode("XYZ")
+
+
+def test_sweep_config_getters_and_commands(device: EB200, sim):
+    assert device.sweep_start() == 20_000_000
+    assert device.sweep_stop() == 100_000_000
+    assert device.sweep_step() == 100_000
+    assert device.sweep_count() == math.inf
+    assert device.sweep_dwell() == 0.0
+    assert device.sweep_direction() == "UP"
+
+    device.set_sweep_start(26_800_000)
+    device.set_sweep_stop(27_800_000)
+    device.set_sweep_step(25_000)
+    device.set_sweep_count(1)
+    device.set_sweep_count(math.inf)
+    device.set_sweep_dwell(0.25)
+    device.set_sweep_direction("down")
+    sent = sim.queries_sent()
+    assert "FREQ:STARt 26800000" in sent
+    assert "FREQ:STOP 27800000" in sent
+    assert "SWEep:STEP 25000" in sent
+    assert "SWEep:COUNt 1" in sent
+    assert "SWEep:COUNt INFinity" in sent
+    assert "SWEep:DWELl 0.250" in sent
+    assert "SWEep:DIRection DOWN" in sent
+
+
+def test_sweep_config_validation(device: EB200):
+    with pytest.raises(ValueError):
+        device.set_sweep_step(0)
+    with pytest.raises(ValueError):
+        device.set_sweep_count(0)
+    with pytest.raises(ValueError):
+        device.set_sweep_dwell(11.0)
+    with pytest.raises(ValueError):
+        device.set_sweep_direction("SIDEWAYS")
+
+
+def test_scan_sweep_end_to_end(sim):
+    receiver = EB200(sim, registry_settle=0.0)
+    sim.queue_responses("TRACe:POINts? MTRACE", [b"0\r\n", b"23\r\n", b"50\r\n"])
+    sim.set_response("TRACe:DATA? MTRACE", b"-17.3,-18.1,9.9E37\r\n")
+    sim.set_response("TRACe:DATA? ITRACE", b"0,26800000,1,26825000,2,26825000\r\n")
+
+    result = receiver.scan_sweep(26_800_000, 27_800_000, 25_000, timeout=5.0)
+
+    assert result.levels == pytest.approx((-17.3, -18.1))
+    assert result.frequencies == (26_800_000, 26_825_000)
+    assert result.restore_errors == ()
+
+    sent = sim.queries_sent()
+    for cmd in (
+        "TRACE:FEED:CONTrol MTRACE,ALWayS",
+        "TRACE:FEED:CONTrol ITRACE,ALWayS",
+        "FREQ:STARt 26800000",
+        "FREQ:STOP 27800000",
+        "SWEep:STEP 25000",
+        "SWEep:COUNt 1",
+        "FREQ:MODE SWEep",
+        "INIT",
+        "ABORt",
+    ):
+        assert cmd in sent
+    for restored in (
+        "FREQ:MODE CW",
+        "FREQ 27260000",
+        "FREQ:STARt 20000000",
+        "FREQ:STOP 100000000",
+        "SWEep:STEP 100000",
+        "SWEep:COUNt INFinity",
+        "TRACE:FEED:CONTrol MTRACE,NEVer",
+        "TRACE:FEED:CONTrol ITRACE,NEVer",
+    ):
+        assert restored in sent
+
+
+def test_scan_sweep_rejects_bad_band(sim):
+    receiver = EB200(sim, registry_settle=0.0)
+    with pytest.raises(ValueError):
+        receiver.scan_sweep(27_800_000, 26_800_000, 25_000)
+    with pytest.raises(ValueError):
+        receiver.scan_sweep(26_800_000, 27_800_000, 0)
+    assert sim.queries_sent() == []  # no instrument traffic on validation error
+
+
+def test_scan_sweep_timeout(sim):
+    receiver = EB200(sim, registry_settle=0.0)
+    with pytest.raises(EB200Timeout):
+        receiver.scan_sweep(26_800_000, 27_800_000, 25_000, timeout=0.7)
 
 
 def test_udp_register_verifies_registry_state(sim):

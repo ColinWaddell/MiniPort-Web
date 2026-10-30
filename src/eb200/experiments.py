@@ -25,7 +25,15 @@ UDP_BASELINE = "DEF\n001\n002\n003"
 UDP_ENTRY_RE = re.compile(r'"(\d{1,3}(?:\.\d{1,3}){3})",\s*(\d+)')
 TRACE_NAMES = ("AUDIO", "IF")
 
-EXPERIMENTS = ("trace-format", "audio-udp", "if-udp", "tag-names", "mode-probe")
+EXPERIMENTS = (
+    "trace-format",
+    "audio-udp",
+    "if-udp",
+    "tag-names",
+    "mode-probe",
+    "sweep-fscan",
+    "trace-buffer",
+)
 
 
 def run(link, name: str, duration: float) -> None:
@@ -39,6 +47,10 @@ def run(link, name: str, duration: float) -> None:
         tag_names(link)
     elif name == "mode-probe":
         mode_probe(link)
+    elif name == "sweep-fscan":
+        sweep_fscan(link, duration)
+    elif name == "trace-buffer":
+        trace_buffer(link, duration)
     else:  # pragma: no cover - argparse restricts choices
         raise ValueError(f"unknown experiment {name!r}")
 
@@ -404,8 +416,264 @@ def tag_names(link) -> None:
         _verify_restored(link, [("TRACE:UDP?", UDP_BASELINE)])
 
 
+def sweep_fscan(link, duration: float) -> None:
+    """Configure a small FSCAN sweep and capture the FSCAN UDP datagrams.
+
+    Exercises FREQ:STARt/STOP, SWEep:STEP/DWELl, FREQ:MODE SWEep and the
+    undocumented FSCAN trace tag; everything is restored afterwards (mode,
+    sweep band, step, registry).
+    """
+    start_state: dict[str, bytes | None] = {}
+    for key, cmd in (
+        ("mode", "FREQ:MODE?"),
+        ("frequency", "FREQ?"),
+        ("start", "FREQ:STARt?"),
+        ("stop", "FREQ:STOP?"),
+        ("sweep-step", "SWEep:STEP?"),
+        ("sweep-dwell", "SWEep:DWELl?"),
+        ("sweep-hold", "SWEep:HOLD:TIME?"),
+        ("sweep-count", "SWEep:COUNt?"),
+        ("sweep-direction", "SWEep:DIRection?"),
+        ("squelch-threshold", "OUTP:SQU:THR?"),
+        ("gain", "GCON?"),
+        ("gain-mode", "GCON:MODE?"),
+    ):
+        try:
+            start_state[key] = link.query(cmd)
+        except Exception as exc:  # noqa: BLE001 - unknown command is data
+            start_state[key] = None
+            link.query_errors_clean()
+            print(f"  {key}: query failed: {exc}")
+        else:
+            print(f"  {key}: {start_state[key]!r}")
+    link.query_errors_clean()
+    _clean_udp_tags(link)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
+    sock.bind(("", 0))
+    port = sock.getsockname()[1]
+    ip = link.local_ip
+    print(f"waiting for FSCAN data on {ip}:{port}")
+
+    def set_checked(cmd: str) -> None:
+        link.issue(cmd)
+        errors = link.query_errors_clean()
+        if errors:
+            print(f"    {cmd} rejected: {errors[0]}")
+
+    try:
+        orig_display = None
+        try:
+            orig_display = link.query("DISP:MENU?")
+        except Exception:  # noqa: BLE001 - query may not exist
+            link.query_errors_clean()
+        print(f"  DISP:MENU? -> {orig_display!r}")
+
+        def window(label: str, seconds: float) -> int:
+            datagrams = _collect_udp(sock, seconds, link)
+            print(f"    - {label}: {len(datagrams)} datagrams in {seconds}s -")
+            if datagrams:
+                print(f"    first: {_report(datagrams[0])}")
+                print(f"    bytes 16..64: {datagrams[0][16:64].hex()}")
+            return len(datagrams)
+
+        # 1. Sweep first, tag registered afterwards (weakmon ordering).
+        set_checked("FREQ:STARt 26800000")
+        set_checked("FREQ:STOP 27800000")
+        set_checked("SWEep:STEP 25000")
+        set_checked("FREQ:MODE SWEep")
+        _register_trace(link, ip, port, "FSCAN")
+        set_checked("INIT")
+        window("sweep + tag + INIT", duration)
+
+        # 2. Raise the squelch threshold so only strong signals hold.
+        set_checked("OUTP:SQU:THR -10")
+        set_checked("INIT")
+        window("squelch threshold -10 dBuV", duration)
+
+        # 3. Real signals: the FM broadcast band.
+        set_checked("FREQ:STARt 87500000")
+        set_checked("FREQ:STOP 108000000")
+        set_checked("SWEep:STEP 100000")
+        set_checked("INIT")
+        window("FM broadcast band", duration)
+
+        # 4. Dwell-hold semantics (hold criterion met every step).
+        set_checked("SWEep:DWELl 0.200")
+        set_checked("INIT")
+        window("dwell 200 ms", duration)
+
+        # 5. FLAG variant without quotes (runds used a quoted PRIVATE).
+        set_checked(f'TRACE:UDP:FLAG:ON "{ip}",{port},PRIVATE')
+        set_checked("INIT")
+        window("FLAG:ON PRIVATE unquoted", duration)
+        link.issue(f'TRACE:UDP:FLAG:OFF "{ip}",{port},PRIVATE')
+        link.query_errors_clean()
+    finally:
+        sock.close()
+        link.issue("ABORt")
+        link.query_errors_clean()
+        if orig_display is not None:
+            orig_menu = orig_display.decode("ascii", "replace").strip().strip('"')
+            link.issue(f"DISP:MENU {orig_menu}")
+            link.query_errors_clean()
+        for key, prefix in (
+            ("frequency", "FREQ"),
+            ("squelch-threshold", "OUTP:SQU:THR"),
+            ("mode", "FREQ:MODE"),
+            ("start", "FREQ:STARt"),
+            ("stop", "FREQ:STOP"),
+            ("sweep-step", "SWEep:STEP"),
+            ("sweep-dwell", "SWEep:DWELl"),
+        ):
+            recorded = start_state[key]
+            if recorded is not None:
+                link.issue(f"{prefix} {recorded.decode('ascii', 'replace').strip()}")
+        link.query_errors_clean()
+        try:
+            _clean_udp_tags(link)
+        except TimeoutError:
+            print("    cleanup: query timed out; re-check TRACE:UDP? manually")
+        checks = []
+        for key, cmd in (
+            ("mode", "FREQ:MODE?"),
+            ("frequency", "FREQ?"),
+            ("start", "FREQ:STARt?"),
+            ("stop", "FREQ:STOP?"),
+            ("sweep-step", "SWEep:STEP?"),
+            ("sweep-dwell", "SWEep:DWELl?"),
+            ("sweep-count", "SWEep:COUNt?"),
+            ("squelch-threshold", "OUTP:SQU:THR?"),
+        ):
+            recorded = start_state[key]
+            note = (
+                "unknown at start"
+                if recorded is None
+                else recorded.decode("ascii", "replace").strip()
+            )
+            checks.append((cmd, note))
+        _verify_restored(link, checks)
+        link.query_errors_clean()
+        print("    cleanup done")
+
+
+def trace_buffer(link, duration: float = 12.0) -> None:
+    """Run a one-cycle FSCAN sweep and read MTRACE/ITRACE (documented path).
+
+    Enables TRACE:FEED:CONTrol for both buffers, sweeps 26.8-27.8 MHz in
+    25 kHz steps once, then reads the trace buffers; everything restored.
+    """
+    start_state: dict[str, bytes | None] = {}
+    for key, cmd in (
+        ("mode", "FREQ:MODE?"),
+        ("frequency", "FREQ?"),
+        ("start", "FREQ:STARt?"),
+        ("stop", "FREQ:STOP?"),
+        ("sweep-step", "SWEep:STEP?"),
+        ("sweep-count", "SWEep:COUNt?"),
+        ("format", "FORMat:DATA?"),
+        ("points-mtrace", "TRACe:POINts? MTRACE"),
+        ("points-itrace", "TRACe:POINts? ITRACE"),
+    ):
+        try:
+            start_state[key] = link.query(cmd)
+        except Exception as exc:  # noqa: BLE001
+            start_state[key] = None
+            link.query_errors_clean()
+            print(f"  {key}: query failed: {exc}")
+        else:
+            print(f"  {key}: {start_state[key]!r}")
+    link.query_errors_clean()
+
+    def set_checked(cmd: str) -> None:
+        link.issue(cmd)
+        errors = link.query_errors_clean()
+        if errors:
+            print(f"    {cmd} rejected: {errors[0]}")
+
+    try:
+        set_checked("TRACE:FEED:CONTrol MTRACE,ALWayS")
+        set_checked("TRACE:FEED:CONTrol ITRACE,ALWayS")
+        set_checked("FREQ:STARt 26800000")
+        set_checked("FREQ:STOP 27800000")
+        set_checked("SWEep:STEP 25000")
+        set_checked("SWEep:COUNt 1")
+        set_checked("FREQ:MODE SWEep")
+        set_checked("INIT")
+        time.sleep(0.5)
+        deadline = time.monotonic() + duration
+        while time.monotonic() < deadline:
+            points = (
+                link.query("TRACe:POINts? MTRACE").decode("ascii", "replace").strip()
+            )
+            sweeping = (
+                link.query("STATus:OPERation:SWEeping:CONDition?")
+                .decode("ascii", "replace")
+                .strip()
+            )
+            print(f"    points={points} sweeping={sweeping}")
+            if points != "0" and sweeping == "0":
+                break
+            time.sleep(0.5)
+        mtrace = link.query("TRACe:DATA? MTRACE")
+        itrace = link.query("TRACe:DATA? ITRACE")
+        print("    MTRACE:", repr(mtrace[:400]))
+        print("    ITRACE:", repr(itrace[:400]))
+        print("    MTRACE points:", repr(link.query("TRACe:POINts? MTRACE")))
+        print("    ITRACE points:", repr(link.query("TRACe:POINts? ITRACE")))
+        set_checked("FORMat:DATA PACKed")
+        packed = link.query("TRACe:DATA? MTRACE")
+        print(
+            "    PACKed MTRACE:", repr(packed[:200]), "... total", len(packed), "bytes"
+        )
+    finally:
+        link.issue("ABORt")
+        link.query_errors_clean()
+        for key, prefix in (
+            ("mode", "FREQ:MODE"),
+            ("frequency", "FREQ"),
+            ("start", "FREQ:STARt"),
+            ("stop", "FREQ:STOP"),
+            ("sweep-step", "SWEep:STEP"),
+            ("sweep-count", "SWEep:COUNt"),
+            ("format", "FORMat:DATA"),
+        ):
+            recorded = start_state[key]
+            if recorded is not None:
+                value = recorded.decode("ascii", "replace").strip()
+                if key == "sweep-count" and "E37" in value:
+                    value = "INFinity"
+                link.issue(f"{prefix} {value}")
+        # FEED control: try to return both buffers to NEVer.
+        for trace in ("MTRACE", "ITRACE"):
+            link.issue(f"TRACE:FEED:CONTrol {trace},NEVer")
+        link.query_errors_clean()
+        checks = []
+        for key, cmd in (
+            ("mode", "FREQ:MODE?"),
+            ("frequency", "FREQ?"),
+            ("start", "FREQ:STARt?"),
+            ("stop", "FREQ:STOP?"),
+            ("sweep-step", "SWEep:STEP?"),
+            ("sweep-count", "SWEep:COUNt?"),
+            ("format", "FORMat:DATA?"),
+            ("points-mtrace", "TRACe:POINts? MTRACE"),
+            ("points-itrace", "TRACe:POINts? ITRACE"),
+        ):
+            recorded = start_state[key]
+            note = (
+                "unknown at start"
+                if recorded is None
+                else recorded.decode("ascii", "replace").strip()
+            )
+            checks.append((cmd, note))
+        _verify_restored(link, checks)
+        link.query_errors_clean()
+        print("    cleanup done")
+
+
 def mode_probe(link) -> None:
-    """Probe SENSe:FREQuency:MODE availability, restoring baseline each time."""
     transcript = link.transcript
     orig = link.query("FREQ:MODE?").decode("ascii", "replace").strip()
     catalog = link.query("TRACe:CATalog?")
