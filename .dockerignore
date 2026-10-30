@@ -1,0 +1,7 @@
+env/
+web/node_modules/
+web/dist/
+data/
+*.db
+__pycache__/
+.git/

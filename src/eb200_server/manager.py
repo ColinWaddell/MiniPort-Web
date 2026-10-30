@@ -86,6 +86,7 @@ class ReceiverManager:
         poll_interval: float = 0.3,
         transport: TCPTransport | None = None,
         data_dir: Path | None = None,
+        settings: dict | None = None,
     ) -> None:
         self._host = host
         self._port = port
@@ -128,6 +129,8 @@ class ReceiverManager:
         self._poll_task: asyncio.Task | None = None
         self._info_task: asyncio.Task | None = None
         self._stopped = False
+        if settings:
+            self.settings.update(settings)
 
     # -- lifecycle -----------------------------------------------------------
 
@@ -481,8 +484,8 @@ class ReceiverManager:
             "remote_af_mode": device.remote_af_mode(),
         }
 
-    async def poll_once(self) -> dict:
-        sampling_allowed = not self._busy()
+    async def poll_once(self, *, offline: bool = False) -> dict:
+        sampling_allowed = not self._busy() and not offline
         error = None
         state = None
         if sampling_allowed:
@@ -535,6 +538,12 @@ class ReceiverManager:
     async def _poll_loop(self) -> None:
         while not self._stopped:
             try:
+                if not self._transport.is_connected:
+                    connected = await asyncio.to_thread(self._transport.reconnect_now)
+                    if not connected:
+                        await self.poll_once(offline=True)
+                        await asyncio.sleep(self._poll_interval)
+                        continue
                 await self.poll_once()
             except asyncio.CancelledError:
                 raise

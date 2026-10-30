@@ -53,10 +53,25 @@ variables.
 
 ## Documentation
 
+- `docs/deployment.md` — production runbook: layered configuration
+  (JSON file / environment / flags), the hardened systemd unit, structured
+  logging, verification checklist, retention settings and the optional
+  (untested) Docker image
 - `docs/capability-report.md` — what this receiver actually supports (firmware 2.80)
 - `docs/scpi-catalogue.md` — every tested command with its captured response
 - `docs/protocol-notes.md` — TCP/UDP framing details and observed quirks
 - `docs/driver-architecture.md` — proposed design for the `eb200` driver
+
+## Deployment quickstart
+
+```bash
+sudo cp packaging/miniport-web.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now miniport-web
+journalctl -u miniport-web -f
+```
+
+The unit binds the LAN, restarts on failure and needs the receiver's UDP
+allowed through ufw for audio (see `docs/deployment.md`).
 
 ## License
 

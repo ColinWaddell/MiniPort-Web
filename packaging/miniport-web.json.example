@@ -1,0 +1,13 @@
+{
+  "_comment": "Optional MiniPort-Web configuration file. Values here are overridden by EB200_* environment variables and CLI flags. See docs/deployment.md.",
+  "web_host": "127.0.0.1",
+  "web_port": 8000,
+  "receiver_host": "10.0.0.240",
+  "receiver_port": 5555,
+  "poll_interval": 0.3,
+  "level_retention_days": 7,
+  "sweep_retention_days": 30,
+  "recording_retention_days": 30,
+  "log_level": "INFO",
+  "log_format": "text"
+}

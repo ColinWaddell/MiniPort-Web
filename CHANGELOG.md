@@ -3,6 +3,32 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-10-30
+
+### Added
+
+- `eb200_server.config`: layered configuration (defaults < JSON `--config`
+  file < `EB200_*` environment variables < CLI flags) with validation and
+  retention values; `packaging/miniport-web.json.example` as the starting
+  file.
+- Structured logging: `--log-format json` emits one JSON object per record
+  (verified live).
+- `packaging/miniport-web.service`: hardened systemd unit
+  (`Restart=always`, `NoNewPrivileges`, `ProtectSystem=full`, read-only
+  home, writable data dir) + documentation in `docs/deployment.md`
+  (install, config, systemd enable, verification checklist, updates).
+- `Dockerfile` (multi-stage node→python) and `.dockerignore` — provided,
+  but this host has no Docker engine: unverified, to be exercised on a
+  Docker-capable machine.
+- **Boot without the receiver**: the transport worker now exists even when
+  the first connect fails (lazily reconnecting), so the web server boots
+  with the instrument down and recovers automatically; a bounded send
+  timeout (`_safe_send`) keeps producers alive when a browser stalls.
+  Verified by a new end-to-end test ("boots offline and recovers when the
+  receiver returns") whose earlier failure (a permanent test hang) was
+  traced via the default executor's stack dump.
+- Retention env wiring (`EB200_LEVEL/sweep/RECORDING_RETENTION_DAYS`).
+
 ## [0.6.0] - 2026-10-30
 
 ### Added

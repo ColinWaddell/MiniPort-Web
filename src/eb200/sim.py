@@ -124,6 +124,17 @@ class SimulatedTransport:
         self.closed = True
         self.connected = False
 
+    @property
+    def is_connected(self) -> bool:
+        """Link-state parity with TCPTransport."""
+        return self.connected
+
+    def reconnect_now(self, connect_timeout: float = 1.5) -> bool:
+        """Bounded reconnect parity with TCPTransport (simulated link)."""
+        del connect_timeout
+        self.connected = True
+        return True
+
     def query(self, cmd: str, timeout: float | None = None) -> bytes:
         self._record(cmd, timeout)
         self._raise_fault_if_any()

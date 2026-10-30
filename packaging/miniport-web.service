@@ -1,0 +1,26 @@
+[Unit]
+Description=MiniPort-Web (R&S EB200 receiver web control)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mrcolin
+WorkingDirectory=/home/mrcolin/Git/MiniPort-Web
+# Bind the trusted LAN only. Never expose the receiver controls to the
+# public internet without adding authentication first.
+Environment=EB200_WEB_HOST=0.0.0.0
+Environment=EB200_DATA_DIR=/home/mrcolin/Git/MiniPort-Web/data
+ExecStart=/home/mrcolin/Git/MiniPort-Web/env/bin/eb200-server
+Restart=always
+RestartSec=3
+
+# Hardening: the service only needs its own venv, frontend build and data dir.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/mrcolin/Git/MiniPort-Web/data
+
+[Install]
+WantedBy=multi-user.target
