@@ -3,6 +3,26 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.2] - 2026-10-30
+
+### Fixed
+
+- Spectrum band changes that cross the previously configured band no longer
+  fail with `-221 Settings conflict;Stop freq lower than start freq`: the
+  driver widens the band first and narrows afterwards (both when
+  configuring a sweep and when restoring afterwards). Found through first
+  real-user testing at the 90-110 MHz band; verified live (201-point cycle,
+  no error) and with a command-ordering regression test.
+
+### Added
+
+- LIVE SPECTRUM / WATERFALL display controls: freeze/resume drawing,
+  clear-waterfall, peak-line and waterfall visibility toggles, PNG export,
+  span chips (0.5/1/5/10 MHz) and step chips (1/5/12.5/25/100 kHz) that
+  centre the band on the receiver's current tune, plus aria labels for the
+  sweep inputs. All are display-level (freeze/clear/toggles/PNG work
+  without control ownership); band/step changes stay control-gated.
+
 ## [0.7.0] - 2026-10-30
 
 ### Added

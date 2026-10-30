@@ -241,6 +241,47 @@ def test_scan_sweep_rejects_bad_band(sim):
     assert sim.queries_sent() == []  # no instrument traffic on validation error
 
 
+def test_scan_sweep_orders_band_changes_safely(sim):
+    """Band moves that would cross the current band widen first (-221 guard)."""
+    receiver = EB200(sim, registry_settle=0.0)
+    sim.queue_responses("TRACe:POINts? MTRACE", [b"42\r\n"])
+    sim.set_response("TRACe:DATA? MTRACE", b"-17.3,9.9E37\r\n")
+    sim.set_response("TRACe:DATA? ITRACE", b"0,120000000,1,120025000,9.9E37,9.9E37\r\n")
+
+    # The hazard: a band starting ABOVE the current stop (20-100 MHz).
+    receiver.scan_sweep(120_000_000, 120_200_000, 25_000, timeout=5.0)
+    band_sets = [
+        cmd
+        for cmd in sim.queries_sent()
+        if cmd.startswith("FREQ:STARt ") or cmd.startswith("FREQ:STOP ")
+    ]
+    assert band_sets[:4] == [
+        "FREQ:STOP 120200000",  # widen above first (STOP < START guard)
+        "FREQ:STARt 20000000",  # widen below (kept the interval valid)
+        "FREQ:STARt 120000000",  # now the target start
+        "FREQ:STOP 120200000",  # then the target stop
+    ], band_sets
+
+    # A band fully below the current start needs no widening either: the
+    # two configure commands follow each other directly.
+    sim.queue_responses("TRACe:POINts? MTRACE", [b"42\r\n"])
+    receiver.scan_sweep(27_000_000, 27_200_000, 25_000, timeout=5.0)
+    sets = receiver_trace(sim)
+    index = sets.index("FREQ:STARt 27000000")
+    assert sets[index : index + 2] == [
+        "FREQ:STARt 27000000",
+        "FREQ:STOP 27200000",
+    ]
+
+
+def receiver_trace(sim):
+    return [
+        c
+        for c in sim.queries_sent()
+        if c.startswith("FREQ:STARt ") or c.startswith("FREQ:STOP ")
+    ]
+
+
 def test_scan_sweep_timeout(sim):
     receiver = EB200(sim, registry_settle=0.0)
     with pytest.raises(EB200Timeout):

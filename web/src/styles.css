@@ -305,6 +305,12 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); color: var(--bad)
 .run.stop { border-color: #5a2f2f; color: var(--bad); }
 .rec-flag { color: var(--bad); letter-spacing: 0.08em; font-size: 0.78rem; }
 .switch.on.rec { border-color: var(--bad); color: var(--bad); }
+.chips-label {
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
 .recordings {
   list-style: none;
   margin: 0;

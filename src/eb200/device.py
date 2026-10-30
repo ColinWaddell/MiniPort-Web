@@ -436,8 +436,7 @@ class EB200:
         try:
             self._set("TRACE:FEED:CONTrol MTRACE,ALWayS")
             self._set("TRACE:FEED:CONTrol ITRACE,ALWayS")
-            self.set_sweep_start(start_hz)
-            self.set_sweep_stop(stop_hz)
+            self._set_band_range(start_hz, stop_hz, recorded)
             self.set_sweep_step(step_hz)
             self.set_sweep_count(1)
             self._set("FREQ:MODE SWEep")
@@ -465,16 +464,63 @@ class EB200:
                 frequencies=tuple(frequencies[:pair_count]),
             )
         finally:
-            restore_errors.extend(self._restore_after_scan(recorded))
+            restore_errors.extend(self._restore_after_scan(recorded, start_hz, stop_hz))
 
-    def _restore_after_scan(self, recorded: dict[str, str | None]) -> list[str]:
+    def _set_band_range(
+        self, start_hz: int, stop_hz: int, recorded: dict[str, str | None]
+    ) -> None:
+        """Set the sweep band without ever leaving STOP < START.
+
+        The instrument rejects intermediate states (-221 'Stop freq lower
+        than start freq'), so band changes widen first, then set the
+        target band. Falls back to direct sets if the recorded values are
+        unavailable.
+        """
+        try:
+            current_start = int(recorded["start"] or "")
+            current_stop = int(recorded["stop"] or "")
+        except ValueError:
+            self.set_sweep_start(start_hz)
+            self.set_sweep_stop(stop_hz)
+            return
+        if start_hz > current_stop or stop_hz < current_start:
+            # widen first (each set keeps the interval valid), then narrow
+            self.set_sweep_stop(max(stop_hz, current_stop))
+            self.set_sweep_start(min(start_hz, current_start))
+        self.set_sweep_start(start_hz)
+        self.set_sweep_stop(stop_hz)
+
+    def _restore_after_scan(
+        self, recorded: dict[str, str | None], scan_start: int, scan_stop: int
+    ) -> list[str]:
         """Best-effort restore of receiver state; collect failures."""
         errors: list[str] = []
         for key, set_cmd in (
             ("mode", None),
             ("frequency", None),
-            ("start", "FREQ:STARt"),
-            ("stop", "FREQ:STOP"),
+        ):
+            value = recorded.get(key)
+            if value is None:
+                continue
+            prefix = set_cmd or ("FREQ:MODE" if key == "mode" else "FREQ")
+            try:
+                self._set(f"{prefix} {value}")
+            except EB200Error as exc:
+                errors.append(f"{prefix} {value}: {exc}")
+        # Band restore uses the same widen/narrow discipline: the recorded
+        # band may sit anywhere relative to the just-scanned one.
+        rec_start, rec_stop = recorded.get("start"), recorded.get("stop")
+        try:
+            if rec_start is not None and rec_stop is not None:
+                target_start, target_stop = int(rec_start), int(rec_stop)
+                if target_start > scan_stop or target_stop < scan_start:
+                    self.set_sweep_stop(max(target_stop, scan_stop))
+                    self.set_sweep_start(min(target_start, scan_start))
+                self.set_sweep_start(target_start)
+                self.set_sweep_stop(target_stop)
+        except EB200Error as exc:
+            errors.append(f"band restore: {exc}")
+        for key, set_cmd in (
             ("step", "SWEep:STEP"),
             ("count", "SWEep:COUNt"),
         ):
@@ -483,11 +529,10 @@ class EB200:
                 continue
             if "E37" in value and key == "count":
                 value = "INFinity"
-            prefix = set_cmd or ("FREQ:MODE" if key == "mode" else "FREQ")
             try:
-                self._set(f"{prefix} {value}")
+                self._set(f"{set_cmd} {value}")
             except EB200Error as exc:
-                errors.append(f"{prefix} {value}: {exc}")
+                errors.append(f"{set_cmd} {value}: {exc}")
         for trace in ("MTRACE", "ITRACE"):
             try:
                 self.trace_feed_control(trace, "NEVer")

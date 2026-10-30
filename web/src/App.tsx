@@ -148,6 +148,7 @@ export function App() {
               ownsControl={ownsControl}
               scanning={snapshot?.scanning ?? false}
               status={snapshot?.spectrum ?? { running: false }}
+              tuneHz={state?.freq_hz ?? null}
             />
           </section>
           <section className="panel panel-wide">
@@ -178,7 +179,7 @@ export function App() {
         </div>
       )}
       <footer className="footer">
-        client {clientId().slice(0, 8)} · MiniPort-Web 0.7.1
+        client {clientId().slice(0, 8)} · MiniPort-Web 0.7.2
       </footer>
     </div>
   );

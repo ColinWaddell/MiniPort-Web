@@ -13,16 +13,32 @@ interface Props {
   ownsControl: boolean;
   scanning: boolean;
   status: SpectrumStatus;
+  tuneHz: number | null;
 }
 
 const DB_MIN_DEFAULT = -120;
 const DB_MAX_DEFAULT = 20;
+
+const SPAN_CHIPS: [string, number][] = [
+  ["0.5 MHz", 500_000],
+  ["1 MHz", 1_000_000],
+  ["5 MHz", 5_000_000],
+  ["10 MHz", 10_000_000],
+];
+const STEP_CHIPS: [string, number][] = [
+  ["1k", 1_000],
+  ["5k", 5_000],
+  ["12.5k", 12_500],
+  ["25k", 25_000],
+  ["100k", 100_000],
+];
 
 export function SpectrumPanel({
   connected,
   ownsControl,
   scanning,
   status,
+  tuneHz,
 }: Props) {
   const [startMhz, setStartMhz] = useState("27.0000");
   const [stopMhz, setStopMhz] = useState("27.4000");
@@ -33,14 +49,30 @@ export function SpectrumPanel({
   const [presetName, setPresetName] = useState("");
   const [lastPeak, setLastPeak] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [frozen, setFrozen] = useState(false);
+  const [showPeak, setShowPeak] = useState(true);
+  const [showWaterfall, setShowWaterfall] = useState(true);
 
   const spectrumCanvas = useRef<HTMLCanvasElement | null>(null);
   const waterfallCanvas = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef<SpectrumFrame | null>(null);
   const scaleRef = useRef({ min: DB_MIN_DEFAULT, max: DB_MAX_DEFAULT });
+  const frozenRef = useRef(false);
+  const showPeakRef = useRef(true);
+  const showWaterfallRef = useRef(true);
   const running = status.running;
   const controllable = connected && ownsControl && !scanning;
   const canStop = connected && ownsControl && running;
+
+  useEffect(() => {
+    frozenRef.current = frozen;
+  }, [frozen]);
+  useEffect(() => {
+    showPeakRef.current = showPeak;
+  }, [showPeak]);
+  useEffect(() => {
+    showWaterfallRef.current = showWaterfall;
+  }, [showWaterfall]);
 
   useEffect(() => {
     scaleRef.current = { min: dbMin, max: dbMax };
@@ -85,7 +117,9 @@ export function SpectrumPanel({
       };
     };
     connect();
-  const draw = window.setInterval(drawCanvases, 100);
+    const draw = window.setInterval(() => {
+      if (!frozenRef.current) drawCanvases();
+    }, 100);
     return () => {
       disposed = true;
       if (timer !== undefined) window.clearTimeout(timer);
@@ -100,9 +134,44 @@ export function SpectrumPanel({
     const waterfall = waterfallCanvas.current;
     if (!frame || !spectrum || !waterfall) return;
     const { min, max } = scaleRef.current;
-    drawSpectrum(spectrum, frame, min, max);
-    appendWaterfall(waterfall, frame, min, max);
+    drawSpectrum(spectrum, frame, min, max, showPeakRef.current);
+    if (showWaterfallRef.current) appendWaterfall(waterfall, frame, min, max);
   }, []);
+
+  const clearWaterfall = () => {
+    const canvas = waterfallCanvas.current;
+    const ctx = canvas?.getContext("2d");
+    if (canvas && ctx) {
+      ctx.fillStyle = "#0a0e14";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  const savePng = () => {
+    const spectrum = spectrumCanvas.current;
+    if (!spectrum) return;
+    const waterfall =
+      showWaterfall && waterfallCanvas.current ? waterfallCanvas.current : null;
+    const canvas = document.createElement("canvas");
+    canvas.width = spectrum.width;
+    canvas.height = spectrum.height + (waterfall ? waterfall.height : 0);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#0a0e14";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(spectrum, 0, 0);
+    if (waterfall) ctx.drawImage(waterfall, 0, spectrum.height);
+    const link = document.createElement("a");
+    link.download = `spectrum-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  const centreOnTune = (span: number) => {
+    if (!tuneHz) return;
+    setStartMhz(((tuneHz - span / 2) / 1e6).toFixed(4));
+    setStopMhz(((tuneHz + span / 2) / 1e6).toFixed(4));
+  };
 
   const start = async () => {
     try {
@@ -185,7 +254,7 @@ export function SpectrumPanel({
           disabled={!canStop}
           onClick={() => api.spectrumResetPeak().catch((error) => setApiError(error.message))}
         >
-          resets
+          RESET PEAK
         </button>
         <a className="link" href="api/spectrum/export.csv" download>
           export CSV
@@ -193,7 +262,66 @@ export function SpectrumPanel({
       </div>
       {apiError ? <ErrorLine text={apiError} /> : null}
       <canvas ref={spectrumCanvas} width={960} height={210} className="spectrum-canvas" />
-      <canvas ref={waterfallCanvas} width={960} height={160} className="spectrum-canvas waterfall" />
+      <canvas
+        ref={waterfallCanvas}
+        width={960}
+        height={160}
+        className="spectrum-canvas waterfall"
+        style={{ display: showWaterfall ? "block" : "none" }}
+      />
+      <div className="field-row">
+        <button
+          className={`switch ${frozen ? "on" : ""}`}
+          aria-pressed={frozen}
+          onClick={() => setFrozen(!frozen)}
+        >
+          {frozen ? "FROZEN — RESUME" : "FREEZE"}
+        </button>
+        <button onClick={clearWaterfall}>CLEAR WATERFALL</button>
+        <button
+          className={`switch ${showPeak ? "on" : ""}`}
+          aria-pressed={showPeak}
+          onClick={() => setShowPeak(!showPeak)}
+        >
+          PEAK LINE {showPeak ? "ON" : "OFF"}
+        </button>
+        <button
+          className={`switch ${showWaterfall ? "on" : ""}`}
+          aria-pressed={showWaterfall}
+          onClick={() => setShowWaterfall(!showWaterfall)}
+        >
+          WATERFALL {showWaterfall ? "SHOWN" : "HIDDEN"}
+        </button>
+        <button onClick={savePng}>SAVE PNG</button>
+      </div>
+      <div className="field-row">
+        <span className="chips-label">SPAN</span>
+        <div className="chips">
+          {SPAN_CHIPS.map(([label, span]) => (
+            <button
+              key={label}
+              className="chip"
+              disabled={!controllable || running || !tuneHz}
+              onClick={() => centreOnTune(span)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <span className="chips-label">STEP</span>
+        <div className="chips">
+          {STEP_CHIPS.map(([label, hz]) => (
+            <button
+              key={label}
+              className={`chip ${Number(stepKhz) * 1e3 === hz ? "active" : ""}`}
+              disabled={!controllable || running}
+              onClick={() => setStepKhz((hz / 1e3).toFixed(1).replace(/\.0$/, ""))}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="field-row">
         <label>
           DISPLAY dBµV MIN
@@ -271,6 +399,7 @@ function drawSpectrum(
   frame: SpectrumFrame,
   dbMin: number,
   dbMax: number,
+  showPeak: boolean,
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -311,7 +440,7 @@ function drawSpectrum(
 
   // trace + peak-hold
   drawLine(ctx, frame.levels, frame, padLeft, plotWidth, toY, "#4fd1c5", 1.5);
-  if (frame.peak) {
+  if (showPeak && frame.peak) {
     drawLine(ctx, frame.peak, frame, padLeft, plotWidth, toY, "#63b3ed", 1);
   }
   // peak marker
