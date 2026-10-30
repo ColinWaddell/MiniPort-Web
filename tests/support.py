@@ -97,8 +97,25 @@ class FakeEB200Server:
             except OSError:
                 pass
 
+    @classmethod
+    def with_defaults(cls) -> FakeEB200Server:
+        """A fake that answers every panel/state query, like the real unit."""
+        from eb200.sim import DEFAULT_RESPONSES
+
+        fake = cls()
+        fake.add_responses(
+            {
+                key: value
+                for key, value in DEFAULT_RESPONSES.items()
+                if key != "SYST:ERR?"
+            }
+        )
+        return fake
+
     def add_responses(self, values: dict[str, bytes]) -> None:
-        self.responses.update(values)
+        self.responses.update(
+            {" ".join(key.split()).upper(): value for key, value in values.items()}
+        )
 
     def _accept_loop(self) -> None:
         # Non-blocking accept: a close() from another thread does not wake

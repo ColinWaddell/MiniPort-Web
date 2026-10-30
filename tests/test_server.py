@@ -1,5 +1,8 @@
 """Server tests with the stateful simulated instrument."""
 
+import asyncio
+import time
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -167,3 +170,32 @@ def test_control_ownership_expiry():
         pass
     else:
         pytest.fail("expected ControlBusy for a fresh second client")
+
+
+def test_stalled_websocket_is_pruned(tmp_path):
+    """A wedge peer must not stall broadcasts (hardened _safe_send)."""
+
+    manager = ReceiverManager(
+        "10.0.0.240",
+        transport=StatefulTransport(),
+        poll_interval=0.05,
+        data_dir=tmp_path,
+    )
+
+    class WedgeWS:
+        async def send_json(self, message):
+            await asyncio.sleep(10)
+
+        async def close(self):
+            pass
+
+    async def scenario():
+        wedge = WedgeWS()
+        manager.websocket_join(wedge, "wedge")
+        started = time.monotonic()
+        await manager.poll_once()  # broadcast hits the wedge and prunes
+        elapsed = time.monotonic() - started
+        assert "wedge" not in manager._clients, "stalled websocket must be pruned"
+        assert elapsed < 4, f"send timeout took too long: {elapsed}"
+
+    asyncio.run(scenario())

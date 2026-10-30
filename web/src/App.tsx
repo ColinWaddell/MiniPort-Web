@@ -178,7 +178,7 @@ export function App() {
         </div>
       )}
       <footer className="footer">
-        client {clientId().slice(0, 8)} · MiniPort-Web 0.6.0
+        client {clientId().slice(0, 8)} · MiniPort-Web 0.7.0
       </footer>
     </div>
   );

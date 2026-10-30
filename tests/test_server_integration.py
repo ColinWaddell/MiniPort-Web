@@ -55,7 +55,9 @@ def live_api(tmp_path_factory):
 
     app = create_app(manager)
     with TestClient(app, raise_server_exceptions=False) as api:
-        faulthandler.dump_traceback_later(70, repeat=True, file=open('/tmp/opencode/teardown-stacks.txt', 'w'))
+        faulthandler.dump_traceback_later(
+            70, repeat=True, file=open("/tmp/opencode/teardown-stacks.txt", "w")
+        )
         yield api
     # fixture teardown: lifespan stops the manager
 

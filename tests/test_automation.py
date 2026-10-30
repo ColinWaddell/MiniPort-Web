@@ -1,6 +1,7 @@
 """SQLite store and automation service tests (phase 6)."""
 
 import asyncio
+import socket as socketlib
 import time
 
 import pytest
@@ -292,3 +293,49 @@ def test_rest_trigger_config(api):
     body = configured.json()
     assert body["armed"] is True and body["threshold_dbuv"] == -25
     assert api.post("/api/trigger", json={"armed": False}).json()["armed"] is False
+
+
+def test_server_boots_offline_and_recovers(tmp_path):
+    """The server must start without the receiver and recover when it returns."""
+    from support import FakeEB200Server
+
+    # A port nothing listens on yet.
+    probe = socketlib.socket()
+    probe.bind(("127.0.0.1", 0))
+    free_port = probe.getsockname()[1]
+    probe.close()
+
+    transport = StatefulTransport()  # unused; see transport=None below
+    _unused = transport
+    manager = ReceiverManager(
+        "127.0.0.1",
+        free_port,
+        poll_interval=0.2,
+        data_dir=tmp_path,
+    )
+    app = create_app(manager)
+    with TestClient(app, raise_server_exceptions=False) as api:
+        offline = api.get("/api/state").json()
+        assert offline["connected"] is False
+        assert offline["state"] is None
+        assert api.get("/api/health").json() == {"status": "ok"}
+
+        # The instrument comes back.
+        fake = FakeEB200Server.with_defaults()
+        fake.start()
+        try:
+            # the fake binds an ephemeral port - point the poll at it
+            manager._transport.host = "127.0.0.1"
+            manager._transport.port = fake.port
+            deadline = time.time() + 10.0
+            connected = False
+            while time.time() < deadline:
+                connected = api.get("/api/state").json()["connected"]
+                if connected:
+                    break
+                time.sleep(0.3)
+            assert connected, "server must reconnect when the receiver returns"
+            state = api.get("/api/state").json()["state"]
+            assert state["freq_hz"] == 27_260_000
+        finally:
+            fake.stop()

@@ -46,8 +46,10 @@ class _Result:
         self._error = error
         self._event.set()
 
-    def wait(self) -> bytes:
-        self._event.wait()
+    def wait(self, timeout: float = 60.0) -> bytes:
+        """Block until the worker settles this request (or raise EB200Timeout)."""
+        if not self._event.wait(timeout):
+            raise EB200Timeout("transport worker did not settle the request")
         if self._error is not None:
             raise self._error
         return self._value or b""
@@ -92,12 +94,23 @@ class TCPTransport:
 
     # -- lifecycle ----------------------------------------------------------
 
-    def start(self) -> None:
+    def start(self, connect_timeout: float | None = None) -> None:
+        """Spawn the worker; an unreachable receiver is *not* fatal here.
+
+        The worker performs the first connection lazily with bounded
+        reconnect attempts, so callers get proper errors per request
+        (``EB200Connection``) instead of a hung ``wait()``.
+        """
+        if connect_timeout is not None:
+            self._connect_timeout = connect_timeout
         with self._lock:
             if self._running:
                 return
-            self._sock = self._open_socket()
-            self._had_socket = True
+            try:
+                self._sock = self._open_socket()
+                self._had_socket = True
+            except EB200Connection:
+                self._sock = None  # connects lazily; errors surface per request
             self._running = True
         self._worker = threading.Thread(
             target=self._work_loop, name="eb200-transport", daemon=True
@@ -129,6 +142,19 @@ class TCPTransport:
     ) -> None:
         self.close()
 
+    def _open_socket(self, timeout: float | None = None) -> socket.socket:
+        try:
+            sock = socket.create_connection(
+                (self.host, self.port), timeout=timeout or self._connect_timeout
+            )
+        except OSError as exc:
+            raise EB200Connection(
+                f"cannot connect to {self.host}:{self.port}: {exc}"
+            ) from exc
+        sock.settimeout(self._timeout)
+        self.local_ip = sock.getsockname()[0]
+        return sock
+
     def _open_socket(self) -> socket.socket:
         try:
             sock = socket.create_connection(
@@ -141,6 +167,36 @@ class TCPTransport:
         sock.settimeout(self._timeout)
         self.local_ip = sock.getsockname()[0]
         return sock
+
+    def reconnect_now(self, connect_timeout: float = 1.5) -> bool:
+        """Bounded synchronous (re)connect; safe to call from any thread.
+
+        Returns True once a link exists (or did already).
+        """
+        with self._lock:
+            if self._sock is not None:
+                return True
+        try:
+            self._ensure_socket_with_timeout(connect_timeout)
+            return True
+        except EB200Connection:
+            return False
+
+    def _ensure_socket_with_timeout(self, connect_timeout: float) -> socket.socket:
+        with self._lock:
+            if self._sock is not None:
+                return self._sock
+            self._sock = self._open_socket(timeout=connect_timeout)
+            was_away = self._had_socket
+            self._had_socket = True
+            reopened = was_away
+            callback = self.on_reconnect if reopened else None
+        if callback is not None:
+            try:
+                callback()
+            except Exception:  # noqa: BLE001 - callbacks must not kill the worker
+                pass
+        return self._sock
 
     def _close_socket(self) -> None:
         with self._lock:
@@ -261,9 +317,10 @@ class TCPTransport:
                 reopened = was_away
             else:
                 return self._sock
-        if reopened and self.on_reconnect is not None:
+            callback = self.on_reconnect if reopened else None
+        if callback is not None:
             try:
-                self.on_reconnect()
+                callback()
             except Exception:  # noqa: BLE001 - callbacks must not kill the worker
                 pass
         return self._sock
