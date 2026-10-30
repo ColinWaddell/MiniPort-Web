@@ -85,17 +85,39 @@ in phase 5 before trusting either number.
   firmware: `IFPAN`, `FSCAN`, `MSCAN`, `CW`, `LIST`, `AUDIO` (probed one by
   one, each cleaned up again — transcript `20261030-161742-exp.jsonl`).
   Note there is no DS-related tag: consistent with Digi-Scan not installed.
-- The tag names correspond to measuring modes (Annex F trace classes);
-  none produces datagrams while the receiver is idle — the corresponding
-  mode has to be active (phase 4 work: run FSCAN/MSCAN sweeps and capture).
-- runds-style IF streaming is not available on this unit: tag `IF` rejected
-  (`-141`), `SYST:IF:REM:MODE` undefined (`-113`), `…FLAG:ON …,"PRIVATE"`
-  rejected (`-151`). The `…:DEFAULT:…` command forms used by weakmon are
+- **Only AUDIO actually streams** — exhaustively verified on 2026-10-30 that
+  FSCAN/MSCAN/CW/LIST/IFPAN tags produce no datagrams: with the sweep
+  running (SWEeping condition non-zero), with `INIT`, `INIT:CONM`, finite
+  `SWEep:COUNt INFinity→2`, squelch thresholds, dwell variants, quoted and
+  unquoted `FLAG:ON PRIVATE` variants, and `DISP:MENU` (whose remote values
+  are only DEFAULT/IFPAN/LEVEL/TONE/FREQ per the manual). The IF trace path
+  that runds uses (`SYST:IF:REM:MODE`) does not exist here. Spectrum via
+  UDP was not achievable on this unit in phase 2; sweep data comes through
+  the documented trace buffers instead (see below).
+- The weakmon-era `…:DEFAULT:…` command forms used by weakmon are
   also undefined on 2.80.
 - Deregistration is a repeated `TRACE:UDP:DELETE` (one entry per call);
   `TAG:OFF` only detaches a tag and actually *creates* a destination entry —
   full details in `protocol-notes.md`.
 - Deregistration is asynchronous as well (~0.2 s); verification must wait.
+
+### Sweep acquisition through the trace buffers (documented path, verified)
+
+One sweep cycle over `FREQ:STARt 26800000 … FREQ:STOP 27800000`,
+`SWEep:STEP 25000` (41 steps):
+
+1. `TRACE:FEED:CONTrol MTRACE,ALWayS` and `…ITRACE,ALWayS`.
+2. `SWEep:COUNt 1`, `FREQ:MODE SWEep`, `INIT` (INIT clears the buffers).
+3. `TRACe:POINts? MTRACE` reaches **42** (41 steps + terminator) within a
+   second for dwell 0; the sweep completes on its own.
+4. `TRACe:DATA? MTRACE` → levels per step in dBµV, trailing `9.91E37`
+   no-data terminator; `TRACe:DATA? ITRACE` → step-index/frequency pairs;
+   reading consumes both buffers (points back to 0).
+5. Sweep bandwidth parameters cannot be changed while a scan runs
+   (`-221,"Settings conflict;Not during scan"`); ABORt first.
+
+The library implements this as `EB200.scan_sweep(start, stop, step)` with
+best-effort state restore reported in `ScanResult.restore_errors`.
 
 ### Trace subsystem (documented, verified idle)
 

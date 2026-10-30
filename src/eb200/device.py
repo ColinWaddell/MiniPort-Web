@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import math
 import re
 import time
 from dataclasses import dataclass
 
-from . import framing
-from .errors import EB200Protocol, SCPIError
+from . import binary, framing
+from .errors import EB200Error, EB200Protocol, EB200Timeout, SCPIError
 from .transport import TCPTransport
 
 # Documented receiver frequency range (10 kHz - 3 GHz).
@@ -26,6 +27,17 @@ DEMODULATION_MODES = ("AM", "FM", "CW", "USB", "LSB")
 REMOTE_AF_MODES = range(0, 14)
 # UDP trace tags accepted by TRACE:UDP:TAG:ON on fw 2.80 (live-probed).
 UDP_TRACE_TAGS = ("AUDIO", "IFPAN", "FSCAN", "MSCAN", "CW", "LIST")
+
+# GCON gain range in dBµV (manual: -30 dBµV max sensitivity .. 110 min).
+GAIN_MIN_DB = -30.0
+GAIN_MAX_DB = 110.0
+# Documented GCON:MODE set; the receiver reads back short forms (FIX, AUTO).
+GAIN_MODES = ("FIXed", "MGC", "AUTO", "AGC")
+GAIN_READBACK = {"FIX": "FIXed", "F": "FIXed", "AUTO": "AUTO"}
+
+# R&S no-data marker (documented): levelled as NaN by the facade.
+NO_DATA_MARKER = 9.9e37
+NO_DATA_LIMIT = 9.0e37
 
 _REGISTRY_ENTRY = re.compile(r'"(\d{1,3}(?:\.\d{1,3}){3})",\s*(\d+)')
 
@@ -57,6 +69,60 @@ def _parse_bool(data: bytes) -> bool:
 
 def _on_off(value: bool) -> str:
     return "ON" if value else "OFF"
+
+
+def _canonical(value: str, choices: tuple[str, ...]) -> str:
+    """Map a case-insensitive spelling onto the documented one."""
+    lowered = value.lower()
+    for choice in choices:
+        if choice.lower() == lowered:
+            return choice
+    raise ValueError(f"unknown value {value!r}; expected one of {choices}")
+
+
+@dataclass(frozen=True)
+class ScanResult:
+    """One completed FSCAN sweep cycle.
+
+    ``levels`` holds per-step measurements in dBµV; steps the receiver
+    could not measure carry NaN. ``frequencies`` holds the matching step
+    frequency in Hz (from ITRACE). ``restore_errors`` lists receivers-side
+    settings that could not be restored (best-effort restore).
+    """
+
+    levels: tuple[float, ...]
+    frequencies: tuple[int, ...]
+    restore_errors: tuple[str, ...] = ()
+
+
+def _parse_trace_levels(text: str) -> list[float]:
+    """Parse an MTRACE level list ('-17.3,-18.1,...,9.9E37')."""
+    values: list[float] = []
+    for token in text.split(","):
+        token = token.strip()
+        if not token:
+            continue
+        value = float(token)
+        values.append(math.nan if value >= NO_DATA_LIMIT else value)
+    while values and math.isnan(values[-1]):
+        values.pop()  # trailing no-data terminator(s)
+    return values
+
+
+def _parse_trace_frequencies(text: str) -> list[int]:
+    """Parse an ITRACE list (index, frequency pairs) into frequencies.
+
+    The list ends with a no-data terminator pair ('9.9E37,9.9E37');
+    no-data frequencies are dropped.
+    """
+    tokens = [t.strip() for t in text.split(",") if t.strip()]
+    frequencies: list[int] = []
+    for i in range(1, len(tokens), 2):
+        value = float(tokens[i])
+        if value >= NO_DATA_LIMIT:
+            break
+        frequencies.append(int(value))
+    return frequencies
 
 
 class EB200:
@@ -161,6 +227,45 @@ class EB200:
     def level(self) -> float:
         return _parse_float(self._t.query('SENS:DATA? "VOLT:AC"'))
 
+    def level_packed(self) -> float:
+        """Level read under FORMat:DATA PACKed (2 bytes, 1/10 dBµV)."""
+        return binary.parse_packed_level(self._t.query('SENS:DATA? "VOLT:AC"'))
+
+    # -- gain control ----------------------------------------------------------
+
+    def gain(self) -> float:
+        """MGC gain in dBµV (-30 = max sensitivity, 110 = min)."""
+        return _parse_float(self._t.query("GCON?"))
+
+    def set_gain(self, dbuv: float) -> None:
+        if not GAIN_MIN_DB <= dbuv <= GAIN_MAX_DB:
+            raise ValueError(f"gain {dbuv} dBµV outside {GAIN_MIN_DB}-{GAIN_MAX_DB}")
+        self._set(f"GCON {dbuv:g}")
+
+    def gain_mode(self) -> str:
+        """GCON mode; read-back short forms mapped to documented spellings."""
+        text = _text(self._t.query("GCON:MODE?"))
+        return GAIN_READBACK.get(text, text)
+
+    def set_gain_mode(self, mode: str) -> None:
+        canonical = _canonical(mode, GAIN_MODES)
+        self._set(f"GCON:MODE {canonical}")
+
+    # -- measuring state ----------------------------------------------------------
+
+    def initiate(self) -> None:
+        """INITiate: provide a current value / (re)start the active scan."""
+        self._set("INIT")
+
+    def abort(self) -> None:
+        """ABORt: stop an active scan (no reply per manual)."""
+        self._t.command("ABORt")
+        self._t.query_errors()
+
+    def sweeping(self) -> bool:
+        """True while the receiver is in an active scan mode (condition != 0)."""
+        return _parse_int(self._t.query("STATus:OPERation:SWEeping:CONDition?")) != 0
+
     # -- squelch ---------------------------------------------------------------
 
     def squelch(self) -> bool:
@@ -212,6 +317,172 @@ class EB200:
 
     def trace_data(self, name: str) -> bytes:
         return self._t.query(f"TRACe:DATA? {name}")
+
+    # -- sweep configuration -----------------------------------------------------
+
+    def sweep_start(self) -> int:
+        """FSCAN sweep start frequency in Hz."""
+        return _parse_int(self._t.query("FREQ:STARt?"))
+
+    def set_sweep_start(self, hz: int) -> None:
+        if not FREQUENCY_MIN_HZ <= hz <= FREQUENCY_MAX_HZ:
+            raise ValueError(f"sweep start {hz} Hz outside receiver range")
+        self._set(f"FREQ:STARt {int(hz)}")
+
+    def sweep_stop(self) -> int:
+        """FSCAN sweep stop frequency in Hz."""
+        return _parse_int(self._t.query("FREQ:STOP?"))
+
+    def set_sweep_stop(self, hz: int) -> None:
+        if not FREQUENCY_MIN_HZ <= hz <= FREQUENCY_MAX_HZ:
+            raise ValueError(f"sweep stop {hz} Hz outside receiver range")
+        self._set(f"FREQ:STOP {int(hz)}")
+
+    def sweep_step(self) -> int:
+        return _parse_int(self._t.query("SWEep:STEP?"))
+
+    def set_sweep_step(self, hz: int) -> None:
+        if not 1 <= hz <= 10_000_000:
+            raise ValueError(f"sweep step {hz} Hz outside 1-10000000")
+        self._set(f"SWEep:STEP {int(hz)}")
+
+    def sweep_count(self) -> float:
+        """Number of sweeps; math.inf for the documented INFinity value."""
+        value = _parse_float(self._t.query("SWEep:COUNt?"))
+        return math.inf if value >= NO_DATA_LIMIT else value
+
+    def set_sweep_count(self, count: int | float) -> None:
+        if count == math.inf:
+            self._set("SWEep:COUNt INFinity")
+        elif isinstance(count, int) and count >= 1:
+            self._set(f"SWEep:COUNt {count}")
+        else:
+            raise ValueError(f"invalid sweep count {count!r}")
+
+    def sweep_dwell(self) -> float:
+        return _parse_float(self._t.query("SWEep:DWELl?"))
+
+    def set_sweep_dwell(self, seconds: float) -> None:
+        if not 0.0 <= seconds <= 10.0:
+            raise ValueError(f"sweep dwell {seconds} s outside 0.0-10.0")
+        self._set(f"SWEep:DWELl {seconds:.3f}")
+
+    def sweep_direction(self) -> str:
+        return _text(self._t.query("SWEep:DIRection?"))
+
+    def set_sweep_direction(self, direction: str) -> None:
+        self._set(f"SWEep:DIRection {_canonical(direction, ('UP', 'DOWN'))}")
+
+    def trace_feed_control(self, name: str, control: str) -> None:
+        """TRACE:FEED:CONTrol <name>, <ALWayS|NEVer> for trace buffers."""
+        self._set(
+            f"TRACE:FEED:CONTrol {name},{_canonical(control, ('ALWayS', 'NEVer'))}"
+        )
+
+    # -- scan acquisition --------------------------------------------------------
+
+    def scan_sweep(
+        self,
+        start_hz: int,
+        stop_hz: int,
+        step_hz: int,
+        *,
+        timeout: float = 30.0,
+    ) -> ScanResult:
+        """Run one FSCAN sweep cycle and return per-step level/frequency.
+
+        Documented path: TRACE:FEED:CONTrol enables MTRACE (levels) and
+        ITRACE (step index + frequency), a single-cycle SWEep fills them
+        (INITiate clears the buffers at start), and TRACe:DATA? returns the
+        value list and consumes it. The receiver's mode, tuner and sweep
+        configuration are restored best-effort afterwards; failures land in
+        ``restore_errors`` instead of failing the scan.
+        """
+        if stop_hz <= start_hz:
+            raise ValueError(f"stop {stop_hz} Hz must be above start {start_hz} Hz")
+        if step_hz <= 0:
+            raise ValueError(f"step {step_hz} Hz must be positive")
+        steps = (stop_hz - start_hz) // step_hz + 1
+
+        recorded: dict[str, str | None] = {}
+        for key, query in (
+            ("mode", "FREQ:MODE?"),
+            ("frequency", "FREQ?"),
+            ("start", "FREQ:STARt?"),
+            ("stop", "FREQ:STOP?"),
+            ("step", "SWEep:STEP?"),
+            ("count", "SWEep:COUNt?"),
+        ):
+            try:
+                recorded[key] = _text(self._t.query(query))
+            except Exception:  # noqa: BLE001 - never block the scan on this
+                recorded[key] = None
+
+        self._t.command("ABORt")
+        self._t.query_errors()
+
+        restore_errors: list[str] = []
+        try:
+            self._set("TRACE:FEED:CONTrol MTRACE,ALWayS")
+            self._set("TRACE:FEED:CONTrol ITRACE,ALWayS")
+            self.set_sweep_start(start_hz)
+            self.set_sweep_stop(stop_hz)
+            self.set_sweep_step(step_hz)
+            self.set_sweep_count(1)
+            self._set("FREQ:MODE SWEep")
+            self._set("INIT")
+
+            deadline = time.monotonic() + timeout
+            while True:
+                if self.trace_points("MTRACE") >= steps:
+                    break
+                if time.monotonic() >= deadline:
+                    raise EB200Timeout(
+                        f"sweep did not produce {steps} values within {timeout}s"
+                    )
+                time.sleep(0.25)
+            self._t.command("ABORt")
+            self._t.query_errors()
+
+            levels = _parse_trace_levels(_text(self._t.query("TRACe:DATA? MTRACE")))
+            frequencies = _parse_trace_frequencies(
+                _text(self._t.query("TRACe:DATA? ITRACE"))
+            )
+            pair_count = min(len(levels), len(frequencies))
+            return ScanResult(
+                levels=tuple(levels[:pair_count]),
+                frequencies=tuple(frequencies[:pair_count]),
+            )
+        finally:
+            restore_errors.extend(self._restore_after_scan(recorded))
+
+    def _restore_after_scan(self, recorded: dict[str, str | None]) -> list[str]:
+        """Best-effort restore of receiver state; collect failures."""
+        errors: list[str] = []
+        for key, set_cmd in (
+            ("mode", None),
+            ("frequency", None),
+            ("start", "FREQ:STARt"),
+            ("stop", "FREQ:STOP"),
+            ("step", "SWEep:STEP"),
+            ("count", "SWEep:COUNt"),
+        ):
+            value = recorded.get(key)
+            if value is None:
+                continue
+            if "E37" in value and key == "count":
+                value = "INFinity"
+            prefix = set_cmd or ("FREQ:MODE" if key == "mode" else "FREQ")
+            try:
+                self._set(f"{prefix} {value}")
+            except EB200Error as exc:
+                errors.append(f"{prefix} {value}: {exc}")
+        for trace in ("MTRACE", "ITRACE"):
+            try:
+                self.trace_feed_control(trace, "NEVer")
+            except EB200Error as exc:
+                errors.append(f"FEED {trace} NEVer: {exc}")
+        return errors
 
     # -- undocumented UDP trace registry ----------------------------------------
     #

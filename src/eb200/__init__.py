@@ -1,6 +1,6 @@
 """Package exports for the eb200 driver."""
 
-from .device import EB200, DeviceInfo
+from .device import EB200, DeviceInfo, ScanResult
 from .errors import (
     EB200Connection,
     EB200Error,
@@ -12,7 +12,7 @@ from .sim import SimulatedTransport
 from .streams import AudioReceiver
 from .transport import TCPTransport
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "AudioReceiver",
@@ -23,6 +23,7 @@ __all__ = [
     "EB200Protocol",
     "EB200Timeout",
     "SCPIError",
+    "ScanResult",
     "SimulatedTransport",
     "TCPTransport",
     "__version__",

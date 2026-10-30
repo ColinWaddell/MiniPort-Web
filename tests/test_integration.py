@@ -92,6 +92,32 @@ def test_udp_registry_idle(receiver):
     assert receiver.udp_registry() == BASELINE_REGISTRY
 
 
+def test_gain_read_modify_restore(receiver):
+    original = receiver.gain()
+    receiver.set_gain(original)
+    assert receiver.gain() == original
+
+
+def test_gain_mode_read_modify_restore(receiver):
+    original = receiver.gain_mode()
+    receiver.set_gain_mode(original)
+    assert receiver.gain_mode() == original
+
+
+def test_scan_sweep_live(receiver):
+    """One real sweep cycle: 41 steps, levels plausible, state restored."""
+    baseline_mode = receiver.frequency_mode()
+    baseline_freq = receiver.frequency()
+    result = receiver.scan_sweep(26_800_000, 27_800_000, 25_000, timeout=20.0)
+    assert len(result.levels) == 41
+    assert result.restore_errors == ()
+    assert result.frequencies[0] == 26_800_000
+    assert result.frequencies[-1] == 27_800_000
+    assert all(-120 <= level <= 40 for level in result.levels)
+    assert receiver.frequency_mode() == baseline_mode
+    assert receiver.frequency() == baseline_freq
+
+
 def test_audio_smoke(receiver, link):
     """Register AUDIO, enable remote AF mode 10, expect datagrams."""
     if os.environ.get("EB200_AUDIO_SMOKE") != "1":
