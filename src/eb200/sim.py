@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import math
 import threading
 from pathlib import Path
 
@@ -209,3 +210,170 @@ class SimulatedTransport:
                 responses[pending] = data
                 pending = None
         return cls(responses=responses)
+
+
+class StatefulTransport(SimulatedTransport):
+    """Simulated transport with a small receiver state machine (tests only).
+
+    Set commands mutate in-memory state; queries read from it, so panel and
+    server tests can observe the effects of control operations. Unknown
+    queries raise loudly instead of returning fake data.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(responses={}, default=None)
+        self._state_lock = threading.Lock()
+        self._state: dict[str, float | int | str | bool] = {
+            "frequency": 27_260_000,
+            "bandwidth": 15_000,
+            "demod": "AM",
+            "freq_mode": "CW",
+            "afc": False,
+            "att_on": False,
+            "att_auto": False,
+            "gain": 50.0,
+            "gain_mode": "AUTO",
+            "squelch": True,
+            "squelch_threshold": -30.0,
+            "volume": 0.0,
+            "remote_af_mode": 0,
+            "level_dbuv": -18.3,
+            "sweeping": False,
+            "sweep_start": 20_000_000,
+            "sweep_stop": 100_000_000,
+            "sweep_step": 100_000,
+            "sweep_count": math.inf,
+        }
+
+    # -- transport API --------------------------------------------------------
+
+    def command(self, cmd: str) -> None:
+        with self._lock:
+            self.requests.append(cmd)
+        key = self._key(cmd)
+        if key == "ABORT":
+            with self._state_lock:
+                self._state["sweeping"] = False
+            return
+        if key == "INIT":
+            with self._state_lock:
+                self._state["sweeping"] = True
+            return
+        parts = cmd.strip().split(" ", 1)
+        if len(parts) != 2:
+            return
+        head = " ".join(parts[0].split()).upper()
+        value = parts[1].strip()
+        with self._state_lock:
+            self._mutate(head, value)
+
+    def _mutate(self, head: str, value: str) -> None:
+        state = self._state
+        boolean = value.strip().upper() in {"ON", "1"}
+        if head == "FREQ":
+            state["frequency"] = int(float(value))
+        elif head == "BAND":
+            state["bandwidth"] = int(float(value))
+        elif head == "DEM":
+            state["demod"] = value.upper()
+        elif head == "FREQ:MODE":
+            state["freq_mode"] = value
+        elif head == "FREQ:AFC":
+            state["afc"] = boolean
+        elif head == "FREQ:START":
+            state["sweep_start"] = int(float(value))
+        elif head == "FREQ:STOP":
+            state["sweep_stop"] = int(float(value))
+        elif head == "INP:ATT:STAT":
+            state["att_on"] = boolean
+        elif head == "INP:ATT:AUTO":
+            state["att_auto"] = boolean
+        elif head == "OUTP:SQU":
+            state["squelch"] = boolean
+        elif head == "OUTP:SQU:THR":
+            state["squelch_threshold"] = float(value)
+        elif head == "GCON":
+            state["gain"] = float(value)
+        elif head == "GCON:MODE":
+            state["gain_mode"] = (
+                "FIXed" if value.upper().startswith("F") else value.upper()
+            )
+        elif head == "SYST:AUD:VOL":
+            state["volume"] = float(value)
+        elif head == "SYST:AUD:REM:MODE":
+            state["remote_af_mode"] = int(float(value))
+        elif head == "SWEep:STEP".upper():
+            state["sweep_step"] = int(float(value))
+        elif head == "SWEep:DWELl".upper():
+            state["sweep_dwell"] = float(value)
+        elif head == "SWEep:COUNt".upper():
+            if "INF" in value.upper():
+                state["sweep_count"] = math.inf
+            else:
+                state["sweep_count"] = float(value)
+        else:  # unknown set command: tolerated like the instrument's silence
+            return
+
+    def query(self, cmd: str, timeout: float | None = None) -> bytes:
+        with self._lock:
+            self.requests.append(cmd)
+        key = self._key(cmd)
+        with self._state_lock:
+            state = {**self._state}
+        answer = self._answer(key, state)
+        if answer is None:
+            raise EB200Protocol(f"stateful sim has no answer for {cmd!r}")
+        return f"{answer}\r\n".encode("ascii", "replace")
+
+    # -- state machine --------------------------------------------------------
+
+    @staticmethod
+    def _answer(key: str, s: dict) -> str | None:
+        if key == "*IDN?":
+            return "ROHDE&SCHWARZ,EB200,108.063/003,V02.80-4052.4654.00"
+        if key == "*OPT?":
+            return "0,0,0,ER,0,0,F1,0"
+        if key == "SYST:VERS?":
+            return "1996.0"
+        if key == "SYST:ERR?":
+            return '0,"No error"'
+        if key == "TRACE:CATALOG?":
+            return '"MTRACE", "ITRACE", "IFPAN", "SSTART", "SSTOP", "UDP"'
+        if key == "TRACe:POINts? MTRACE".upper():
+            return "0"
+        if key == "TRACE:UDP?":
+            return "DEF\n001\n002\n003"
+        if key == "STATUS:OPERATION:SWEEPING:CONDITION?":
+            return "8" if s["sweeping"] else "0"
+        if key == 'SENS:DATA? "VOLT:AC"':
+            return f"{float(s['level_dbuv']):.1f}"
+        boolean = lambda name: "1" if s[name] else "0"  # noqa: E731
+        simple = {
+            "FREQ?": f"{int(s['frequency'])}",
+            "FREQ:MODE?": str(s["freq_mode"]),
+            "FREQ:AFC?": boolean("afc"),
+            "FREQ:START?": f"{int(s['sweep_start'])}",
+            "FREQ:STOP?": f"{int(s['sweep_stop'])}",
+            "BAND?": f"{int(s['bandwidth'])}",
+            "BAND? MINIMUM": "150",
+            "BAND? MAXIMUM": "150000",
+            "DEM?": str(s["demod"]),
+            "DEMODULATION?": str(s["demod"]),
+            "SWEep:STEP?".upper(): f"{int(s['sweep_step'])}",
+            "SWEep:COUNt?".upper(): (
+                "9.9E37" if s["sweep_count"] == math.inf else f"{s['sweep_count']:.0f}"
+            ),
+            "SWEep:DWELl?".upper(): f"{float(s.get('sweep_dwell', 0.0)):.3f}",
+            "SWEep:DIRection?".upper(): "UP",
+            "INP:ATT:STAT?": boolean("att_on"),
+            "INP:ATT:AUTO?": boolean("att_auto"),
+            "GCON?": f"{float(s['gain']):g}",
+            "GCON:MODE?": str(s["gain_mode"]),
+            "OUTP:SQU?": boolean("squelch"),
+            "OUTP:SQU:THR?": f"{float(s['squelch_threshold']):g}",
+            "OUTP:SQU:CONT?": "NONE",
+            "SYST:AUD:VOL?": f"{float(s['volume']):.2f}",
+            "SYST:AUD:REM:MODE?": f"{int(s['remote_af_mode'])}",
+            "DISP:ENAB?": "1",
+        }
+        return simple.get(key)
