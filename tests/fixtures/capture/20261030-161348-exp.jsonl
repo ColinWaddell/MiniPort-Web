@@ -1,0 +1,52 @@
+{"t": "2026-10-30T16:13:48.058+00:00", "kind": "tx", "data_b64": "Rk9STWF0OkRBVEE/Cg==", "cmd": "FORMat:DATA?"}
+{"t": "2026-10-30T16:13:48.080+00:00", "kind": "rx", "data_b64": "QVNDDQo="}
+{"t": "2026-10-30T16:13:48.080+00:00", "kind": "tx", "data_b64": "Rk9STWF0OkRBVEEgUkVBTCwzMgo=", "cmd": "FORMat:DATA REAL,32"}
+{"t": "2026-10-30T16:13:50.082+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:13:50.083+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:50.090+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtGT1JNQVQ6REFUQSBSRUFMLDMyIg0K"}
+{"t": "2026-10-30T16:13:50.090+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:50.096+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:50.096+00:00", "kind": "tx", "data_b64": "U0VOUzpEQVRBPyAiVk9MVDpBQyIK", "cmd": "SENS:DATA? \"VOLT:AC\""}
+{"t": "2026-10-30T16:13:50.103+00:00", "kind": "rx", "data_b64": "LTE5LjINCg=="}
+{"t": "2026-10-30T16:13:50.103+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:50.106+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:50.106+00:00", "kind": "experiment", "data_b64": "LTE5LjINCg==", "cmd": "SENS:DATA? \"VOLT:AC\"", "note": "{'format': 'REAL,32', 'errors': []}"}
+{"t": "2026-10-30T16:13:50.106+00:00", "kind": "tx", "data_b64": "VFJBQ2U6REFUQT8gTVRSQUNFCg==", "cmd": "TRACe:DATA? MTRACE"}
+{"t": "2026-10-30T16:13:50.109+00:00", "kind": "rx", "data_b64": "OS45MUUzNw0K"}
+{"t": "2026-10-30T16:13:50.109+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:50.116+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:50.116+00:00", "kind": "experiment", "data_b64": "OS45MUUzNw0K", "cmd": "TRACe:DATA? MTRACE", "note": "{'format': 'REAL,32', 'errors': []}"}
+{"t": "2026-10-30T16:13:50.116+00:00", "kind": "tx", "data_b64": "VFJBQ2U6REFUQT8gIk1UUkFDRSIK", "cmd": "TRACe:DATA? \"MTRACE\""}
+{"t": "2026-10-30T16:13:52.123+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:52.128+00:00", "kind": "rx", "data_b64": "LTE1OCwiU3RyaW5nIGRhdGEgbm90IGFsbG93ZWQ7VFJBQ0U6REFUQT8gIk1UUkFDRSIiDQo="}
+{"t": "2026-10-30T16:13:52.128+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:52.135+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:52.135+00:00", "kind": "experiment", "data_b64": "PHRpbWVvdXQ+", "cmd": "TRACe:DATA? \"MTRACE\"", "note": "{'format': 'REAL,32', 'errors': ['-158,\"String data not allowed;TRACE:DATA? \"MTRACE\"\"']}"}
+{"t": "2026-10-30T16:13:52.136+00:00", "kind": "tx", "data_b64": "Rk9STWF0OkRBVEEgSU5ULDE2Cg==", "cmd": "FORMat:DATA INT,16"}
+{"t": "2026-10-30T16:13:54.138+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:13:54.138+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:54.143+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtGT1JNQVQ6REFUQSBJTlQsMTYiDQo="}
+{"t": "2026-10-30T16:13:54.144+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:54.150+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:54.150+00:00", "kind": "tx", "data_b64": "U0VOUzpEQVRBPyAiVk9MVDpBQyIK", "cmd": "SENS:DATA? \"VOLT:AC\""}
+{"t": "2026-10-30T16:13:54.158+00:00", "kind": "rx", "data_b64": "LTE4LjANCg=="}
+{"t": "2026-10-30T16:13:54.158+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:54.204+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:54.204+00:00", "kind": "experiment", "data_b64": "LTE4LjANCg==", "cmd": "SENS:DATA? \"VOLT:AC\"", "note": "{'format': 'INT,16', 'errors': []}"}
+{"t": "2026-10-30T16:13:54.204+00:00", "kind": "tx", "data_b64": "VFJBQ2U6REFUQT8gTVRSQUNFCg==", "cmd": "TRACe:DATA? MTRACE"}
+{"t": "2026-10-30T16:13:54.211+00:00", "kind": "rx", "data_b64": "OS45MUUzNw0K"}
+{"t": "2026-10-30T16:13:54.211+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:54.216+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:54.216+00:00", "kind": "experiment", "data_b64": "OS45MUUzNw0K", "cmd": "TRACe:DATA? MTRACE", "note": "{'format': 'INT,16', 'errors': []}"}
+{"t": "2026-10-30T16:13:54.216+00:00", "kind": "tx", "data_b64": "VFJBQ2U6REFUQT8gIk1UUkFDRSIK", "cmd": "TRACe:DATA? \"MTRACE\""}
+{"t": "2026-10-30T16:13:56.222+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:56.232+00:00", "kind": "rx", "data_b64": "LTE1OCwiU3RyaW5nIGRhdGEgbm90IGFsbG93ZWQ7VFJBQ0U6REFUQT8gIk1UUkFDRSIiDQo="}
+{"t": "2026-10-30T16:13:56.233+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:56.239+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:56.239+00:00", "kind": "experiment", "data_b64": "PHRpbWVvdXQ+", "cmd": "TRACe:DATA? \"MTRACE\"", "note": "{'format': 'INT,16', 'errors': ['-158,\"String data not allowed;TRACE:DATA? \"MTRACE\"\"']}"}
+{"t": "2026-10-30T16:13:56.239+00:00", "kind": "tx", "data_b64": "Rk9STWF0OkRBVEEgQVNDCg==", "cmd": "FORMat:DATA ASC"}
+{"t": "2026-10-30T16:13:58.240+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:13:58.240+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:13:58.335+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:13:58.335+00:00", "kind": "tx", "data_b64": "Rk9STWF0OkRBVEE/Cg==", "cmd": "FORMat:DATA?"}
+{"t": "2026-10-30T16:13:58.342+00:00", "kind": "rx", "data_b64": "QVNDDQo="}

@@ -5,20 +5,27 @@ state, perform the (reversible) test, restore the recorded state, then
 re-verify it by query and drain the SCPI error queue. Every exchange is
 written to the transcript, so the result doubles as a regression fixture.
 
-The commands exercised here include undocumented ones (`TRACE:UDP:*`) that
-are known to work on EB200 firmware from community implementations; whether
-they behave the same on this unit is precisely what the experiments answer.
+The `TRACE:UDP:*` commands exercised here are undocumented in the manual but
+known to work on EB200 firmware from community implementations (weakmon,
+runds_connector); whether they behave the same on this unit is exactly what
+the experiments answer. Note that registration entries have proven sticky:
+`_clean_udp_tags` removes them again and verifies the baseline list.
 """
 
 from __future__ import annotations
 
+import re
 import socket
 import struct
 import time
 
-AUDIO_MODE_8K = 10  # 8 kHz, 16 bit, 1 channel, per SYSTem:AUDio:REMote:MODe table
+AUDIO_MODE_8K = 10  # 8 kHz, 16 bit, 1 channel (SYSTem:AUDio:REMote:MODe table)
 
-EXPERIMENTS = ("trace-format", "audio-udp", "if-udp", "mode-probe")
+UDP_BASELINE = "DEF\n001\n002\n003"
+UDP_ENTRY_RE = re.compile(r'"(\d{1,3}(?:\.\d{1,3}){3})",\s*(\d+)')
+TRACE_NAMES = ("AUDIO", "IF")
+
+EXPERIMENTS = ("trace-format", "audio-udp", "if-udp", "tag-names", "mode-probe")
 
 
 def run(link, name: str, duration: float) -> None:
@@ -28,6 +35,8 @@ def run(link, name: str, duration: float) -> None:
         audio_udp(link, duration)
     elif name == "if-udp":
         if_udp(link, duration)
+    elif name == "tag-names":
+        tag_names(link)
     elif name == "mode-probe":
         mode_probe(link)
     else:  # pragma: no cover - argparse restricts choices
@@ -35,7 +44,56 @@ def run(link, name: str, duration: float) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# helpers
+# UDP trace registry helpers
+# --------------------------------------------------------------------------- #
+
+
+def _udp_list(link) -> str:
+    return link.query("TRACE:UDP?").decode("ascii", "replace")
+
+
+def _udp_at_baseline(link) -> bool:
+    return _udp_list(link).strip() == UDP_BASELINE
+
+
+def _clean_udp_tags(link) -> bool:
+    """Remove UDP trace registrations until the baseline list returns.
+
+    TAG:ON/OFF/DELETE have no documented syntax and the receiver applies
+    changes asynchronously (an immediate re-query still shows the old
+    list), so a short settle delay follows every command. Plain
+    'TRACE:UDP:DELETE "ip",port' appears to be the effective command;
+    the other variants are kept as fallbacks. Returns True when the
+    TRACE:UDP? list matches the no-entry baseline again.
+    """
+    if _udp_at_baseline(link):
+        print("    UDP trace list already at baseline")
+        return True
+    print(f"    UDP trace list before cleanup: {_udp_list(link)!r}")
+    addrs = set(UDP_ENTRY_RE.findall(_udp_list(link)))
+    cmds: list[str] = []
+    for ip, port in addrs:
+        cmds.append(f'TRACE:UDP:DELETE "{ip}",{port}')
+        for trace in TRACE_NAMES:
+            cmds.append(f'TRACE:UDP:TAG:OFF "{ip}",{port},{trace}')
+        cmds.append(f'TRACE:UDP:DELETE "{ip}",{port}')
+    for slot in (1, 2, 3):
+        cmds.append(f"TRACE:UDP:DELETE {slot:03d}")
+    for cmd in cmds:
+        link.issue(cmd)
+        errors = link.query_errors_clean()
+        print(f"    cleanup {cmd} -> {'ok' if not errors else errors[0]}")
+        time.sleep(0.2)
+        if _udp_at_baseline(link):
+            break
+    time.sleep(0.2)
+    restored = _udp_at_baseline(link)
+    print(f"    UDP trace list after cleanup: {_udp_list(link)!r}")
+    return restored
+
+
+# --------------------------------------------------------------------------- #
+# generic experiment helpers
 # --------------------------------------------------------------------------- #
 
 
@@ -83,10 +141,7 @@ def _print_capture(datagrams: list[bytes]) -> None:
     for dg in datagrams[:2]:
         print(f"    first bytes {dg.hex()[:120]}")
         print(f"    header: {_report(dg)}")
-    seqs: list[int] = []
-    for dg in datagrams:
-        if len(dg) >= 10:
-            seqs.append(int.from_bytes(dg[8:10], "big"))
+    seqs = [int.from_bytes(dg[8:10], "big") for dg in datagrams if len(dg) >= 10]
     losses = sum(
         1 for a, b in zip(seqs, seqs[1:], strict=False) if ((b - a) & 0xFFFF) > 1
     )
@@ -97,6 +152,7 @@ def _print_capture(datagrams: list[bytes]) -> None:
 def _register_trace(link, ip: str, port: int, trace: str) -> str | None:
     candidates = (
         f'TRACE:UDP:TAG:ON "{ip}",{port},{trace}',
+        f'TRACE:UDP:DEFAULT:TAG:ON "{ip}", {port}, {trace}',
         f'TRACE:UDP:DEFAULT:TAG:ON "{ip}", {port}, {trace}',
     )
     for cmd in candidates:
@@ -110,22 +166,10 @@ def _register_trace(link, ip: str, port: int, trace: str) -> str | None:
     return None
 
 
-def _unregister_trace(
-    link, ip: str, port: int, trace: str, registered: str | None
-) -> None:
-    """Stop and delete the UDP trace registration (best effort, all variants)."""
-    if registered is not None and "DEFAULT" not in registered:
-        link.issue(f'TRACE:UDP:TAG:OFF "{ip}",{port},{trace}')
-        link.query_errors_clean()
-    if registered is not None:
-        link.issue(f'TRACE:UDP:DELETE "{ip}",{port}')
-        link.query_errors_clean()
-
-
 def _verify_restored(link, expectations: list[tuple[str, str]]) -> None:
     for cmd, expected_note in expectations:
-        data = link.query(cmd)
-        print(f"    restored check {cmd}: {data!r} ({expected_note})")
+        data = link.query(cmd).decode("ascii", "replace").strip()
+        print(f"    restored check {cmd}: {data!r} (expected {expected_note!r})")
 
 
 # --------------------------------------------------------------------------- #
@@ -142,25 +186,30 @@ def trace_format(link) -> None:
 
     samples: list[tuple[str, str]] = []
     try:
-        for fmt in ("REAL,32", "INT,16"):
+        for fmt in ("PACKed",):
             link.issue(f"FORMat:DATA {fmt}")
             errors = link.query_errors_clean()
             if errors:
                 print(f"  FORMat:DATA {fmt!r} rejected: {errors[0]}")
             for label, cmd in (
                 ("level", 'SENS:DATA? "VOLT:AC"'),
+                ("level-again", 'SENS:DATA? "VOLT:AC"'),
                 ("mtrace", "TRACe:DATA? MTRACE"),
-                ("mtrace-quoted", 'TRACe:DATA? "MTRACE"'),
+                ("itrace", "TRACe:DATA? ITRACE"),
             ):
                 try:
                     data = link.query(cmd)
                 except TimeoutError:
                     data = b"<timeout>"
                 errors = link.query_errors_clean()
-                note = {"format": fmt, "errors": errors}
-                print(f"  [{fmt:>8}] {label:14} -> {data!r}  errors={errors or '-'}")
+                print(f"  [{fmt:>7}] {label:12} -> {data!r}  errors={errors or '-'}")
                 if transcript is not None:
-                    transcript.log("experiment", cmd, data, note=str(note))
+                    transcript.log(
+                        "experiment",
+                        cmd,
+                        data,
+                        note=str({"format": fmt, "errors": errors}),
+                    )
                 samples.append((f"{fmt}/{label}", data.hex()))
         print(f"  hex summary: { {k: v[:64] for k, v in samples} }")
     finally:
@@ -174,11 +223,19 @@ def trace_format(link) -> None:
 
 
 def audio_udp(link, duration: float) -> None:
-    """Enable remote AF, capture UDP audio datagrams, then restore state."""
-    orig_udp = link.query("TRACE:UDP?")
+    """Enable remote AF, capture UDP audio datagrams, then restore state.
+
+    Command order and the tag variants follow weakmon (mode 10 first, then
+    tag registration). A squelch-off window (squelch can gate AF) and the
+    DEFAULT tag variant are tried if the first window is silent.
+    """
+    orig_udp = _udp_list(link)
     orig_mode = link.query("SYST:AUD:REM:MODE?").decode("ascii", "replace").strip()
+    orig_squelch = link.query("OUTP:SQU?").decode("ascii", "replace").strip()
     print(f"initial TRACE:UDP? : {orig_udp!r}")
     print(f"initial SYST:AUD:REM:MODE? : {orig_mode}")
+    print(f"initial OUTP:SQU? : {orig_squelch}")
+    _clean_udp_tags(link)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
@@ -188,24 +245,60 @@ def audio_udp(link, duration: float) -> None:
     print(f"waiting for audio on {ip}:{port}")
 
     registered: str | None = None
+    squelch_restored = False
     try:
-        registered = _register_trace(link, ip, port, "AUDIO")
+        # weakmon order: audio mode first, then the tag registration.
         link.issue(f"SYST:AUD:REM:MODE {AUDIO_MODE_8K}")
         errors = link.query_errors_clean()
         print(f"    SYST:AUD:REM:MODE 10 -> {'accepted' if not errors else errors}")
+        registered = _register_trace(link, ip, port, "AUDIO")
+        trace_status = link.query("STATus:TRACe:CONDition?")
+        print(f"    STATus:TRACe:CONDition? -> {trace_status!r}")
         datagrams = _collect_udp(sock, duration, link)
+        print("    - window 1: mode 10 + TAG:ON AUDIO -")
         _print_capture(datagrams)
+
+        if not datagrams and orig_squelch == "1":
+            # Squelch may gate the AF output; briefly force it open.
+            link.issue("OUTP:SQU OFF")
+            errors = link.query_errors_clean()
+            print(f"    OUTP:SQU OFF -> {'accepted' if not errors else errors}")
+            datagrams = _collect_udp(sock, duration, link)
+            print("    - window 2: squelch forced off -")
+            _print_capture(datagrams)
+            link.issue(f"OUTP:SQU {orig_squelch}")
+            link.query_errors_clean()
+            squelch_restored = True
+
+        if not datagrams:
+            # Last variant: the DEFAULT TAG path used by weakmon.
+            link.issue(f'TRACE:UDP:DEFAULT:TAG:ON "{ip}", {port}, AUDIO')
+            errors = link.query_errors_clean()
+            print(
+                "    TRACE:UDP:DEFAULT:TAG:ON -> "
+                f"{'accepted' if not errors else errors}"
+            )
+            registered = registered or "DEFAULT-variant"
+            datagrams = _collect_udp(sock, duration, link)
+            print("    - window 3: DEFAULT tag variant -")
+            _print_capture(datagrams)
     finally:
         sock.close()
-        # Restore audio mode first so the stream stops, then drop the tag.
+        if not squelch_restored:
+            link.issue(f"OUTP:SQU {orig_squelch}")
+            link.query_errors_clean()
         link.issue(f"SYST:AUD:REM:MODE {orig_mode or '0'}")
         link.query_errors_clean()
-        _unregister_trace(link, ip, port, "AUDIO", registered)
+        try:
+            _clean_udp_tags(link)
+        except TimeoutError:
+            print("    cleanup: query timed out; re-check TRACE:UDP? manually")
         _verify_restored(
             link,
             [
-                ("TRACE:UDP?", orig_udp.decode("ascii", "replace")),
-                ("SYST:AUD:REM:MODE?", orig_mode),
+                ("TRACE:UDP?", UDP_BASELINE),
+                ("SYST:AUD:REM:MODE?", orig_mode or "0"),
+                ("OUTP:SQU?", orig_squelch or "1"),
             ],
         )
         link.query_errors_clean()
@@ -214,8 +307,11 @@ def audio_udp(link, duration: float) -> None:
 
 def if_udp(link, duration: float) -> None:
     """Attempt to enable the undocumented UDP IF trace (spectrum data)."""
-    orig_udp = link.query("TRACE:UDP?")
+    orig_udp = _udp_list(link)
+    orig_mode = link.query("FREQ:MODE?").decode("ascii", "replace").strip()
     print(f"initial TRACE:UDP? : {orig_udp!r}")
+    print(f"initial FREQ:MODE? : {orig_mode}")
+    _clean_udp_tags(link)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
@@ -224,15 +320,14 @@ def if_udp(link, duration: float) -> None:
     ip = link.local_ip
     print(f"waiting for IF data on {ip}:{port}")
 
-    registered: str | None = None
     try:
-        registered = _register_trace(link, ip, port, "IF")
-        # runds sends the PRIVATE flag in a separate command.
+        _register_trace(link, ip, port, "IF")
+        # runds sends the PRIVATE flag as a separate command.
         link.issue(f'TRACE:UDP:FLAG:ON "{ip}",{port},"PRIVATE"')
         errors = link.query_errors_clean()
         print(f"    FLAG:ON PRIVATE -> {'accepted' if not errors else errors}")
         datagrams = _collect_udp(sock, duration, link)
-        print("    - before SYST:IF:REM:MODE -")
+        print("    - window 1: IF tag in CW mode -")
         _print_capture(datagrams)
         if not datagrams:
             link.issue("SYST:IF:REM:MODE SHORT")
@@ -241,18 +336,76 @@ def if_udp(link, duration: float) -> None:
                 f"    SYST:IF:REM:MODE SHORT -> {'accepted' if not errors else errors}"
             )
             datagrams = _collect_udp(sock, duration, link)
-            print("    - after SYST:IF:REM:MODE SHORT -")
+            print("    - window 2: after SYST:IF:REM:MODE SHORT -")
             _print_capture(datagrams)
     finally:
         sock.close()
-        _unregister_trace(link, ip, port, "IF", registered)
-        _verify_restored(link, [("TRACE:UDP?", orig_udp.decode("ascii", "replace"))])
+        try:
+            _clean_udp_tags(link)
+        except TimeoutError:
+            print("    cleanup: query timed out; re-check TRACE:UDP? manually")
+        _verify_restored(
+            link, [("TRACE:UDP?", UDP_BASELINE), ("FREQ:MODE?", orig_mode)]
+        )
         link.query_errors_clean()
         print("    cleanup done")
 
 
+def tag_names(link) -> None:
+    """Probe which trace names TRACE:UDP:TAG:ON accepts (one at a time).
+
+    Each accepted name is cleaned up again immediately. If a tag produces
+    datagrams on its own (no audio mode needed), they are captured.
+    """
+    _clean_udp_tags(link)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
+    sock.bind(("", 0))
+    port = sock.getsockname()[1]
+    ip = link.local_ip
+    accepted: list[str] = []
+    try:
+        for name in (
+            "IFPAN",
+            "FS",
+            "CM",
+            "LEVEL",
+            "MEAS",
+            "FSCAN",
+            "MSCAN",
+            "CW",
+            "LIST",
+            "TRACE",
+            "UDP",
+        ):
+            cmd = f'TRACE:UDP:TAG:ON "{ip}",{port},{name}'
+            link.issue(cmd)
+            errors = link.query_errors_clean()
+            if errors:
+                print(f"  {name:8} rejected: {errors[0]}")
+                continue
+            accepted.append(name)
+            datagrams = _collect_udp(sock, 1.5, link)
+            print(f"  {name:8} ACCEPTED, datagrams={len(datagrams)}")
+            if datagrams:
+                _print_capture(datagrams)
+            link.issue(f'TRACE:UDP:TAG:OFF "{ip}",{port},{name}')
+            link.query_errors_clean()
+            link.issue(f'TRACE:UDP:DELETE "{ip}",{port}')
+            link.query_errors_clean()
+            if not _udp_at_baseline(link):
+                print(f"  {name:8} did not clean up; running full cleanup")
+                _clean_udp_tags(link)
+            print(f"  {name:8} done;")
+    finally:
+        sock.close()
+        _clean_udp_tags(link)
+        print(f"  accepted tag names: {accepted}")
+        _verify_restored(link, [("TRACE:UDP?", UDP_BASELINE)])
+
+
 def mode_probe(link) -> None:
-    """Probe SENSe:FREQuency:MODE availability, restoring CW after each test."""
+    """Probe SENSe:FREQuency:MODE availability, restoring baseline each time."""
     transcript = link.transcript
     orig = link.query("FREQ:MODE?").decode("ascii", "replace").strip()
     catalog = link.query("TRACe:CATalog?")

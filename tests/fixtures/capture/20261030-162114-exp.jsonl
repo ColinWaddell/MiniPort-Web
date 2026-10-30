@@ -1,0 +1,80 @@
+{"t": "2026-10-30T16:21:14.669+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:14.686+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:14.686+00:00", "kind": "tx", "data_b64": "VFJBQ2U6Q0FUYWxvZz8K", "cmd": "TRACe:CATalog?"}
+{"t": "2026-10-30T16:21:14.692+00:00", "kind": "rx", "data_b64": "Ik1UUkFDRSIsICJJVFJBQ0UiLCAiSUZQQU4iLCAiU1NUQVJUIiwgIlNTVE9QIiwgIlVEUCINCg=="}
+{"t": "2026-10-30T16:21:14.692+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIEZJWGVkCg==", "cmd": "FREQ:MODE FIXed"}
+{"t": "2026-10-30T16:21:16.694+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:16.695+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:16.698+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:16.698+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:16.705+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:16.705+00:00", "kind": "experiment", "data_b64": "Q1c=", "cmd": "FREQ:MODE FIXed", "note": "[]"}
+{"t": "2026-10-30T16:21:16.705+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:18.707+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:18.707+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:18.711+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:18.711+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIFNXRWVwCg==", "cmd": "FREQ:MODE SWEep"}
+{"t": "2026-10-30T16:21:20.712+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:20.712+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:20.721+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:20.721+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:20.727+00:00", "kind": "rx", "data_b64": "U1dFDQo="}
+{"t": "2026-10-30T16:21:20.727+00:00", "kind": "experiment", "data_b64": "U1dF", "cmd": "FREQ:MODE SWEep", "note": "[]"}
+{"t": "2026-10-30T16:21:20.727+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:22.728+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:22.728+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:22.735+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:22.735+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIE1TQ2FuCg==", "cmd": "FREQ:MODE MSCan"}
+{"t": "2026-10-30T16:21:24.737+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:24.737+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:24.744+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:24.744+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:24.756+00:00", "kind": "rx", "data_b64": "TVNDDQo="}
+{"t": "2026-10-30T16:21:24.756+00:00", "kind": "experiment", "data_b64": "TVND", "cmd": "FREQ:MODE MSCan", "note": "[]"}
+{"t": "2026-10-30T16:21:24.756+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:26.759+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:26.759+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:26.768+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:26.768+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIERTQ2FuCg==", "cmd": "FREQ:MODE DSCan"}
+{"t": "2026-10-30T16:21:28.770+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:28.770+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:28.782+00:00", "kind": "rx", "data_b64": "MSwiRGV2aWNlIGRlcGVuZGVudCBlcnJvcjtOb3QgaW5zdGFsbGVkIg0K"}
+{"t": "2026-10-30T16:21:28.782+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:28.789+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:28.789+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:28.797+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:28.797+00:00", "kind": "experiment", "data_b64": "Q1c=", "cmd": "FREQ:MODE DSCan", "note": "['1,\"Device dependent error;Not installed\"']"}
+{"t": "2026-10-30T16:21:28.797+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:30.799+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:30.799+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:30.811+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:30.811+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIEZBU1RsZXZjdwo=", "cmd": "FREQ:MODE FASTlevcw"}
+{"t": "2026-10-30T16:21:32.814+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:32.814+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:32.822+00:00", "kind": "rx", "data_b64": "MSwiRGV2aWNlIGRlcGVuZGVudCBlcnJvcjtOb3QgaW5zdGFsbGVkIg0K"}
+{"t": "2026-10-30T16:21:32.822+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:32.829+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:32.829+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:32.837+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:32.837+00:00", "kind": "experiment", "data_b64": "Q1c=", "cmd": "FREQ:MODE FASTlevcw", "note": "['1,\"Device dependent error;Not installed\"']"}
+{"t": "2026-10-30T16:21:32.837+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:34.840+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:34.840+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:34.848+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:34.848+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIExJU1QK", "cmd": "FREQ:MODE LIST"}
+{"t": "2026-10-30T16:21:36.853+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:36.853+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:36.857+00:00", "kind": "rx", "data_b64": "MSwiRGV2aWNlIGRlcGVuZGVudCBlcnJvcjtOb3QgaW5zdGFsbGVkIg0K"}
+{"t": "2026-10-30T16:21:36.857+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:36.863+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:36.864+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:36.867+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:36.867+00:00", "kind": "experiment", "data_b64": "Q1c=", "cmd": "FREQ:MODE LIST", "note": "['1,\"Device dependent error;Not installed\"']"}
+{"t": "2026-10-30T16:21:36.867+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFIENXCg==", "cmd": "FREQ:MODE CW"}
+{"t": "2026-10-30T16:21:38.868+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:21:38.868+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:38.873+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:21:38.873+00:00", "kind": "tx", "data_b64": "RlJFUTpNT0RFPwo=", "cmd": "FREQ:MODE?"}
+{"t": "2026-10-30T16:21:38.880+00:00", "kind": "rx", "data_b64": "Q1cNCg=="}
+{"t": "2026-10-30T16:21:38.880+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:21:38.884+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}

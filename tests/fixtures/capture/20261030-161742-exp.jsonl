@@ -1,0 +1,642 @@
+{"t": "2026-10-30T16:17:42.593+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:42.616+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:17:42.616+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxJRlBBTgo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,IFPAN"}
+{"t": "2026-10-30T16:17:44.618+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:44.619+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:44.626+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:46.129+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUZQQU4K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IFPAN"}
+{"t": "2026-10-30T16:17:48.129+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:48.130+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:48.138+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:48.138+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:17:50.140+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:50.140+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:50.156+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:50.156+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:50.166+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:50.166+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:50.177+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:50.177+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:50.187+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:50.187+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:50.197+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:50.197+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:50.207+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:50.207+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:17:52.209+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:52.210+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:52.218+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:52.218+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:52.230+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:52.230+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,AUDIO"}
+{"t": "2026-10-30T16:17:54.232+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:54.232+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:54.240+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:54.240+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:54.256+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:54.256+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:17:56.258+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:56.258+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:56.265+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTyINCg=="}
+{"t": "2026-10-30T16:17:56.265+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:56.272+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:56.272+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:56.280+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:56.280+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:17:58.283+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:17:58.283+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:17:58.294+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:17:58.294+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:17:58.302+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:17:58.302+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:00.304+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:00.304+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:00.310+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:18:00.310+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:00.321+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:00.321+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:00.420+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:00.420+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUYK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:18:02.422+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:02.422+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:02.434+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9GRiAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:18:02.434+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:02.441+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:02.441+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:02.450+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:02.450+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsSUYK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,IF"}
+{"t": "2026-10-30T16:18:04.452+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:04.452+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:04.460+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6REVGQVVMVDpUQUc6T0ZGICIxMC4wLjAuMzUiLCAzOTk0MywiDQo="}
+{"t": "2026-10-30T16:18:04.460+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:04.468+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:04.468+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:04.572+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:04.572+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRgo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:18:06.573+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:06.573+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:06.610+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:18:06.610+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:06.627+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:06.628+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:06.640+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:06.640+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:08.641+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:08.641+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:08.649+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:08.650+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:08.657+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:08.657+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:10.659+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:10.659+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:10.666+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:18:10.666+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:10.675+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:10.675+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:10.685+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:10.685+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:12.688+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:12.688+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:12.695+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMiDQo="}
+{"t": "2026-10-30T16:18:12.695+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:12.698+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:12.698+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:12.708+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:12.708+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:14.710+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:14.710+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:14.721+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMiDQo="}
+{"t": "2026-10-30T16:18:14.721+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:14.733+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:14.733+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:14.934+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:14.934+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:16.936+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:16.936+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:16.943+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:16.943+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:16.950+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:16.951+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:17.202+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:17.202+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:17.211+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:17.211+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxGUwo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,FS"}
+{"t": "2026-10-30T16:18:19.212+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:19.212+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:19.220+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLEZTIg0K"}
+{"t": "2026-10-30T16:18:19.220+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:19.227+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:19.227+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxDTQo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,CM"}
+{"t": "2026-10-30T16:18:21.230+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:21.230+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:21.237+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLENNIg0K"}
+{"t": "2026-10-30T16:18:21.237+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:21.246+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:21.246+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxMRVZFTAo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,LEVEL"}
+{"t": "2026-10-30T16:18:23.252+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:23.252+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:23.259+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLExFVkVMIg0K"}
+{"t": "2026-10-30T16:18:23.259+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:23.265+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:23.265+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxNRUFTCg==", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,MEAS"}
+{"t": "2026-10-30T16:18:25.267+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:25.268+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:25.274+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLE1FQVMiDQo="}
+{"t": "2026-10-30T16:18:25.274+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:25.278+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:25.278+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxGU0NBTgo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,FSCAN"}
+{"t": "2026-10-30T16:18:27.280+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:27.280+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:27.342+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:28.845+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsRlNDQU4K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,FSCAN"}
+{"t": "2026-10-30T16:18:30.856+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:30.856+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:30.866+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:30.867+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:32.868+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:32.869+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:32.874+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:32.874+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:32.882+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:32.882+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:33.128+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:33.128+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:33.141+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:33.141+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:33.178+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:33.178+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:33.186+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:33.186+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:18:35.188+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:35.188+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:35.195+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:35.196+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:35.206+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:35.207+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,AUDIO"}
+{"t": "2026-10-30T16:18:37.208+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:37.208+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:37.215+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:37.215+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:37.224+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:37.224+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:18:39.226+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:39.226+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:39.230+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTyINCg=="}
+{"t": "2026-10-30T16:18:39.230+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:39.236+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:39.236+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:39.243+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:39.243+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:41.246+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:41.246+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:41.249+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:41.249+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:41.256+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:41.256+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:43.260+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:43.260+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:43.267+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:18:43.267+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:43.274+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:43.274+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:43.280+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:43.280+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUYK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:18:45.283+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:45.283+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:45.288+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9GRiAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:18:45.288+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:45.295+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:45.295+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:45.303+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:45.303+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsSUYK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,IF"}
+{"t": "2026-10-30T16:18:47.304+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:47.304+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:47.312+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6REVGQVVMVDpUQUc6T0ZGICIxMC4wLjAuMzUiLCAzOTk0MywiDQo="}
+{"t": "2026-10-30T16:18:47.312+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:47.320+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:47.320+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:47.328+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:47.328+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRgo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:18:49.331+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:49.331+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:49.341+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:18:49.342+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:49.349+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:49.349+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:49.459+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:49.459+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:51.461+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:51.461+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:51.479+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:51.479+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:51.609+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:51.609+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:53.611+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:53.611+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:53.619+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:18:53.619+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:53.631+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:53.631+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:53.639+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:53.639+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:55.640+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:55.640+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:55.647+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMiDQo="}
+{"t": "2026-10-30T16:18:55.647+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:55.653+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:55.653+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:55.663+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:55.663+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:18:57.668+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:57.668+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:57.675+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMiDQo="}
+{"t": "2026-10-30T16:18:57.675+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:57.681+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:57.681+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:57.692+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:18:57.692+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:18:59.695+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:18:59.695+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:18:59.701+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:18:59.701+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:59.711+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:59.711+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:59.724+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:59.724+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:18:59.734+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:18:59.734+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxNU0NBTgo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,MSCAN"}
+{"t": "2026-10-30T16:19:01.737+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:01.737+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:01.743+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:03.248+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsTVNDQU4K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,MSCAN"}
+{"t": "2026-10-30T16:19:05.251+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:05.251+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:05.258+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:05.259+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:07.260+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:07.260+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:07.268+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:07.268+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:07.280+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:07.280+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:07.440+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:07.441+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:07.450+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:07.450+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:07.476+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:07.476+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:07.588+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:07.588+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:19:09.590+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:09.590+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:09.599+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:09.600+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:09.607+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:09.607+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,AUDIO"}
+{"t": "2026-10-30T16:19:11.608+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:11.608+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:11.615+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:11.615+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:11.643+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:11.643+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:19:13.644+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:13.644+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:13.647+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTyINCg=="}
+{"t": "2026-10-30T16:19:13.647+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:13.650+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:13.651+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:13.657+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:13.657+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:15.659+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:15.660+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:15.667+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:15.668+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:15.675+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:15.675+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:19:17.677+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:17.677+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:17.682+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:19:17.682+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:17.689+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:17.689+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:17.697+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:17.697+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUYK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:19:19.698+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:19.698+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:19.707+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9GRiAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:19:19.707+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:19.714+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:19.714+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:19.722+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:19.722+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsSUYK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,IF"}
+{"t": "2026-10-30T16:19:21.724+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:21.724+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:21.730+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6REVGQVVMVDpUQUc6T0ZGICIxMC4wLjAuMzUiLCAzOTk0MywiDQo="}
+{"t": "2026-10-30T16:19:21.730+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:21.738+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:21.738+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:21.749+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:21.749+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRgo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:19:23.751+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:23.751+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:23.770+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:19:23.770+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:23.777+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:23.777+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:23.788+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:23.788+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:25.792+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:25.792+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:25.804+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:25.804+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:25.812+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:25.812+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:19:27.812+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:27.812+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:27.820+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:19:27.821+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:27.832+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:27.832+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:27.859+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:27.859+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:29.860+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:29.860+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:29.868+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMiDQo="}
+{"t": "2026-10-30T16:19:29.868+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:29.875+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:29.875+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:29.909+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:29.909+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:19:31.911+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:31.911+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:31.920+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMiDQo="}
+{"t": "2026-10-30T16:19:31.920+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:31.927+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:31.927+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:32.160+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:32.160+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:34.162+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:34.162+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:34.175+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:34.175+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:34.186+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:19:34.186+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:34.193+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:19:34.193+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:34.201+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:19:34.201+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxDVwo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,CW"}
+{"t": "2026-10-30T16:19:36.206+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:36.206+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:36.214+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:37.716+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQ1cK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,CW"}
+{"t": "2026-10-30T16:19:39.719+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:39.719+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:39.726+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:39.726+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:41.728+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:41.728+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:41.735+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:41.735+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:41.745+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:41.745+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:41.759+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:41.759+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:41.769+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:41.769+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:41.780+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:41.780+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:41.790+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:41.791+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:19:43.796+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:43.796+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:43.804+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:43.804+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:43.813+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:43.813+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,AUDIO"}
+{"t": "2026-10-30T16:19:45.816+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:45.816+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:45.824+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:45.824+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:45.832+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:45.832+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:19:47.836+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:47.836+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:47.848+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTyINCg=="}
+{"t": "2026-10-30T16:19:47.848+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:47.855+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:47.855+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:47.862+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:47.862+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:19:49.864+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:49.864+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:49.880+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:49.880+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:49.980+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:49.980+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:19:51.980+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:51.980+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:51.988+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:19:51.988+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:51.996+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:51.996+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:52.129+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:52.129+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUYK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:19:54.130+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:54.131+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:54.139+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9GRiAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:19:54.139+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:54.147+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:54.147+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:54.238+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:54.239+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsSUYK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,IF"}
+{"t": "2026-10-30T16:19:56.244+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:56.244+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:56.248+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6REVGQVVMVDpUQUc6T0ZGICIxMC4wLjAuMzUiLCAzOTk0MywiDQo="}
+{"t": "2026-10-30T16:19:56.248+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:56.251+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:56.251+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:56.326+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:56.326+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRgo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:19:58.328+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:19:58.328+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:58.339+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:19:58.339+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:19:58.343+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:19:58.343+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:19:58.352+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:19:58.352+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:00.354+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:00.354+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:00.365+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:00.365+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:00.375+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:00.375+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:20:02.376+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:02.376+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:02.387+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:20:02.387+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:02.394+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:02.394+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:02.573+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:02.573+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:04.575+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:04.575+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:04.583+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMiDQo="}
+{"t": "2026-10-30T16:20:04.583+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:04.590+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:04.590+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:04.723+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:04.723+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:20:06.726+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:06.726+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:06.734+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMiDQo="}
+{"t": "2026-10-30T16:20:06.734+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:06.740+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:06.740+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:06.873+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:06.873+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:08.874+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:08.874+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:08.882+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:08.882+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:08.992+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:08.992+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:09.007+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:09.007+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:09.021+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:09.021+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxMSVNUCg==", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,LIST"}
+{"t": "2026-10-30T16:20:11.023+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:11.023+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:11.030+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:12.532+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsTElTVAo=", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,LIST"}
+{"t": "2026-10-30T16:20:14.534+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:14.535+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:14.541+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:14.541+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:16.544+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:16.544+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:16.553+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:16.553+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:16.566+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:16.566+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:16.577+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:16.577+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:16.590+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:16.590+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:16.607+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:16.607+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:16.619+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:16.619+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:20:18.620+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:18.620+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:18.626+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:18.627+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:18.638+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:18.638+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsQVVESU8K", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,AUDIO"}
+{"t": "2026-10-30T16:20:20.640+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:20.640+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:20.758+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:20.758+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:20.777+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:20.777+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,AUDIO"}
+{"t": "2026-10-30T16:20:22.780+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:22.780+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:22.923+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxBVURJTyINCg=="}
+{"t": "2026-10-30T16:20:22.923+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:22.929+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:22.929+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:23.056+00:00", "kind": "rx", "data_b64": "REVGICIxMC4wLjAuMzUiLCAzOTk0MywgCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:23.056+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:25.058+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:25.058+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:25.068+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:25.068+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:25.078+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:25.078+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:20:27.084+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:27.084+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:27.092+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:20:27.092+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:27.099+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:27.099+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:27.149+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:27.149+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMsSUYK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:20:29.151+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:29.151+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:29.160+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9GRiAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:20:29.160+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:29.167+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:29.167+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:29.299+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:29.299+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMsSUYK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943,IF"}
+{"t": "2026-10-30T16:20:31.301+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:31.302+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:31.311+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6REVGQVVMVDpUQUc6T0ZGICIxMC4wLjAuMzUiLCAzOTk0MywiDQo="}
+{"t": "2026-10-30T16:20:31.311+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:31.317+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:31.317+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:31.326+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:31.326+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRgo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943,IF"}
+{"t": "2026-10-30T16:20:33.328+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:33.328+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:33.451+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0MyxJRiINCg=="}
+{"t": "2026-10-30T16:20:33.451+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:33.458+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:33.458+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:33.600+00:00", "kind": "rx", "data_b64": "REVGCjAwMSAiMTAuMC4wLjM1IiwgMzk5NDMsIAowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:33.600+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:35.603+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:35.603+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:35.614+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:35.615+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:35.622+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:35.622+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6REVMRVRFICIxMC4wLjAuMzUiLCAzOTk0Mwo=", "cmd": "TRACE:UDP:DEFAULT:DELETE \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:20:37.624+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:37.624+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:37.631+00:00", "kind": "rx", "data_b64": "LTExMywiVW5kZWZpbmVkIGhlYWRlcjtUUkFDRTpVRFA6REVGQVVMVDpERUxFVEUgIjEwLjAuMC4zNSIsIDM5OTQzIg0K"}
+{"t": "2026-10-30T16:20:37.632+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:37.639+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:37.639+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:37.646+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:37.646+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMK", "cmd": "TRACE:UDP:TAG:OFF \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:39.648+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:39.648+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:39.660+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOlRBRzpPRkYgIjEwLjAuMC4zNSIsMzk5NDMiDQo="}
+{"t": "2026-10-30T16:20:39.661+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:39.752+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:39.752+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:40.051+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:40.051+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMK", "cmd": "TRACE:UDP:DEFAULT:TAG:OFF \"10.0.0.35\", 39943"}
+{"t": "2026-10-30T16:20:42.052+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:42.052+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:42.060+00:00", "kind": "rx", "data_b64": "LTEwMywiSW52YWxpZCBzZXBhcmF0b3I7VFJBQ0U6VURQOkRFRkFVTFQ6VEFHOk9GRiAiMTAuMC4wLjM1IiwgMzk5NDMiDQo="}
+{"t": "2026-10-30T16:20:42.060+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:42.067+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:42.067+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:42.202+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIgIjEwLjAuMC4zNSIsIDM5OTQzLCAKMDAzDQo="}
+{"t": "2026-10-30T16:20:42.202+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOkRFTEVURSAiMTAuMC4wLjM1IiwzOTk0Mwo=", "cmd": "TRACE:UDP:DELETE \"10.0.0.35\",39943"}
+{"t": "2026-10-30T16:20:44.206+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:44.206+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:44.214+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:44.214+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:44.221+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:44.221+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:44.253+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:44.253+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:44.454+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:44.454+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxUUkFDRQo=", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,TRACE"}
+{"t": "2026-10-30T16:20:46.457+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:46.457+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:46.468+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLFRSQUNFIg0K"}
+{"t": "2026-10-30T16:20:46.468+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:46.475+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:46.476+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQOlRBRzpPTiAiMTAuMC4wLjM1IiwzOTk0MyxVRFAK", "cmd": "TRACE:UDP:TAG:ON \"10.0.0.35\",39943,UDP"}
+{"t": "2026-10-30T16:20:48.476+00:00", "kind": "rx", "data_b64": "", "note": "issue"}
+{"t": "2026-10-30T16:20:48.477+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:48.484+00:00", "kind": "rx", "data_b64": "LTE0MSwiSW52YWxpZCBjaGFyYWN0ZXIgZGF0YTtUUkFDRTpVRFA6VEFHOk9OICIxMC4wLjAuMzUiLDM5OTQzLFVEUCINCg=="}
+{"t": "2026-10-30T16:20:48.484+00:00", "kind": "tx", "data_b64": "U1lTVDpFUlI/Cg==", "cmd": "SYST:ERR?"}
+{"t": "2026-10-30T16:20:48.490+00:00", "kind": "rx", "data_b64": "MCwiTm8gZXJyb3IiDQo="}
+{"t": "2026-10-30T16:20:48.490+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:48.497+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
+{"t": "2026-10-30T16:20:48.497+00:00", "kind": "tx", "data_b64": "VFJBQ0U6VURQPwo=", "cmd": "TRACE:UDP?"}
+{"t": "2026-10-30T16:20:48.507+00:00", "kind": "rx", "data_b64": "REVGCjAwMQowMDIKMDAzDQo="}
