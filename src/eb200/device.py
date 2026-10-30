@@ -33,6 +33,13 @@ GAIN_MIN_DB = -30.0
 GAIN_MAX_DB = 110.0
 # Documented GCON:MODE set; the receiver reads back short forms (FIX, AUTO).
 GAIN_MODES = ("FIXed", "MGC", "AUTO", "AGC")
+GAIN_ALIASES = {
+    "fix": "FIXed",
+    "fixed": "FIXed",
+    "mgc": "MGC",
+    "auto": "AUTO",
+    "agc": "AGC",
+}
 GAIN_READBACK = {"FIX": "FIXed", "F": "FIXed", "AUTO": "AUTO"}
 
 # R&S no-data marker (documented): levelled as NaN by the facade.
@@ -248,7 +255,11 @@ class EB200:
         return GAIN_READBACK.get(text, text)
 
     def set_gain_mode(self, mode: str) -> None:
-        canonical = _canonical(mode, GAIN_MODES)
+        canonical = GAIN_ALIASES.get(mode.strip().lower())
+        if canonical is None:
+            raise ValueError(
+                f"unknown gain mode {mode!r}; expected one of {GAIN_MODES}"
+            )
         self._set(f"GCON:MODE {canonical}")
 
     # -- measuring state ----------------------------------------------------------

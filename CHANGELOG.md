@@ -3,6 +3,39 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-10-30
+
+### Added
+
+- FastAPI application server (`eb200_server`): the single owner of the
+  receiver session, polling live state and broadcasting WebSocket snapshots
+  to any number of browsers. Control ops are serialised; browser ownership
+  of the controls (adopt-on-first-use or explicit acquire, 120 s TTL)
+  prevents competing control operations (second client → HTTP 409).
+- REST surface: `/api/state`, `/api/device` (device info + capabilities),
+  frequency/demod/bandwidth/gain/gain-mode/attenuator/squelch/
+  squelch-threshold/volume/afc/operation control endpoints, one-cycle
+  `/api/scan`, health. Errors map to 400/409/502/503. Binds localhost by
+  default (`eb200-server --host … --receiver-host …`).
+- React + TypeScript + Vite control panel (`web/`): instrument-style dark
+  panel with frequency display/entry and step buttons, live S-meter,
+  demodulator + IF bandwidth, gain and RF attenuator, squelch, receiver AF
+  volume, single-sweep scan panel with canvas level trace, connection and
+  control-ownership badges, reconnect with backoff, responsive tablet
+  layout. The built bundle is served by FastAPI.
+- `StatefulTransport` in `eb200.sim`: stateful set/query simulator used by
+  13 server tests (incl. ownership lockout and WebSocket stream) and the
+  rest of the suite.
+- Gated live REST integration tests (`tests/test_server_integration.py`):
+  every control endpoint written own-value discipline plus one real sweep
+  and the ownership lockout, against the physical EB200.
+
+### Verified
+
+- Browser E2E (Playwright) against the live receiver: frequency stepping,
+  gain mode/MGC, squelch toggle, panel-driven scan, control lockout with a
+  second client, WS state flow, and the mobile layout.
+
 ## [0.2.0] - 2026-10-30
 
 ### Added
