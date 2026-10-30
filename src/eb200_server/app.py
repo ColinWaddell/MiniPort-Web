@@ -20,10 +20,12 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from eb200.errors import EB200Error
+from eb200_server.audio import AudioError
 from eb200_server.manager import CAPABILITIES, ControlBusy, ReceiverManager
 from eb200_server.spectrum import SpectrumParams
 
@@ -362,6 +364,82 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
             pass
         finally:
             manager.spectrum_leave(ws)
+
+    @app.post("/api/audio/start")
+    async def audio_start(x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        return await _control_call(manager.audio_start(x_eb200_client))
+
+    @app.post("/api/audio/stop")
+    async def audio_stop(x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        return await _control_call(manager.audio_stop(x_eb200_client))
+
+    @app.get("/api/audio/stats")
+    async def audio_stats() -> dict:
+        return manager.audio_status()
+
+    @app.post("/api/audio/record/{action}")
+    async def audio_record(action: str, x_eb200_client: str = Header(None)) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        try:
+            return await manager.audio_record(x_eb200_client, action)
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        except AudioError as exc:
+            raise HTTPException(400, str(exc)) from None
+        except EB200Error as exc:
+            raise HTTPException(502, f"receiver reported: {exc}") from None
+        except OSError as exc:
+            raise HTTPException(503, f"receiver error: {exc}") from None
+
+    @app.get("/api/audio/recordings")
+    async def audio_recordings() -> dict:
+        return {"recordings": manager.audio_recordings()}
+
+    @app.get("/api/audio/recordings/{name}")
+    async def audio_recording_download(name: str) -> Response:
+        try:
+            path = manager.audio_recording_path(name)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+        except FileNotFoundError:
+            raise HTTPException(404, "recording not found") from None
+        return FileResponse(path, media_type="audio/wav", filename=path.name)
+
+    @app.delete("/api/audio/recordings/{name}")
+    async def audio_recording_delete(
+        name: str, x_eb200_client: str = Header(None)
+    ) -> dict:
+        if not x_eb200_client:
+            raise HTTPException(400, "X-Eb200-Client header required")
+        try:
+            deleted = manager.audio_recording_delete(x_eb200_client, name)
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+        except FileNotFoundError:
+            raise HTTPException(404, "recording not found") from None
+        return {"deleted": deleted}
+
+    @app.websocket("/ws/audio")
+    async def audio_socket(ws: WebSocket, client_id: str = ""):
+        await ws.accept()
+        manager.audio_join(ws, client_id)
+        await ws.send_json({"type": "audio-config", **manager.audio_status()})
+        try:
+            while True:
+                message = await ws.receive_json()
+                if message.get("type") == "hb":
+                    manager.note_activity(ws)
+        except WebSocketDisconnect:
+            pass
+        finally:
+            manager.audio_leave(ws)
 
     _mount_frontend(app)
     return app

@@ -19,6 +19,7 @@ from pathlib import Path
 from eb200.device import EB200, ScanResult
 from eb200.errors import EB200Error
 from eb200.transport import DEFAULT_PORT, TCPTransport
+from eb200_server.audio import AudioService
 from eb200_server.presets import PresetStore, csv_export
 from eb200_server.spectrum import SpectrumParams, SpectrumService
 
@@ -91,12 +92,17 @@ class ReceiverManager:
         self._receiver_lock = asyncio.Lock()
         self._clients: dict[object, str] = {}
         self._spectrum_clients: dict[object, str] = {}
+        self._audio_clients: dict[object, str] = {}
         self._owner_id: str | None = None
         self._owner_seen = 0.0
         self._snapshot: dict | None = None
         self._scanning = False
         self._last_connected = False
         self._spectrum: SpectrumService | None = None
+        self._audio = AudioService(
+            self._device,
+            Path(__file__).resolve().parents[2] / "data" / "recordings",
+        )
         self._preset_store = PresetStore(
             Path(__file__).resolve().parents[2] / "data" / "scan-presets.json"
         )
@@ -117,6 +123,8 @@ class ReceiverManager:
 
     async def aclose(self) -> None:
         self._stopped = True
+        if self._audio is not None and self._audio.running:
+            await self._audio.stop()
         if self._spectrum is not None:
             await self._spectrum.stop()
         for task in (self._poll_task, self._info_task):
@@ -147,6 +155,61 @@ class ReceiverManager:
 
     def spectrum_leave(self, ws: object) -> None:
         self._spectrum_clients.pop(ws, None)
+
+    def audio_join(self, ws: object, client_id: str) -> None:
+        self._audio_clients[ws] = client_id
+
+    def audio_leave(self, ws: object) -> None:
+        self._audio_clients.pop(ws, None)
+
+    async def _audio_frame(self, payload: bytes) -> None:
+        for ws in list(self._audio_clients):
+            if payload.startswith(b'{"type"'):
+                sent = await self._safe_send(ws, ws.send_text, payload.decode("ascii"))
+            else:
+                sent = await self._safe_send(ws, ws.send_bytes, payload)
+            if not sent:
+                self._audio_clients.pop(ws, None)
+
+    # -- audio streaming -----------------------------------------------------------
+
+    async def audio_start(self, client_id: str) -> dict:
+        self._ensure_control(client_id)
+        self._spectrum_guard()
+        ip = self._transport.local_ip
+        async with self._receiver_lock:
+            await asyncio.to_thread(self._audio.prepare, client_id, ip)
+        self._audio.set_sink(self._audio_frame)
+        self._audio.begin_pump()
+        return self._audio.status()
+
+    async def audio_stop(self, client_id: str) -> dict:
+        self._ensure_control(client_id)
+        self._audio.request_stop()
+        async with self._receiver_lock:
+            await asyncio.to_thread(self._audio.teardown)
+        return self._audio.status()
+
+    async def audio_record(self, client_id: str, action: str) -> dict:
+        self._ensure_control(client_id)
+        if action == "start":
+            return await asyncio.to_thread(self._audio.record_start, client_id)
+        if action == "stop":
+            return await asyncio.to_thread(self._audio.record_stop)
+        raise ValueError(f"unknown audio record action {action!r}")
+
+    def audio_status(self) -> dict:
+        return self._audio.status()
+
+    def audio_recordings(self) -> list[dict]:
+        return self._audio.list_recordings()
+
+    def audio_recording_path(self, name: str) -> Path:
+        return self._audio.recording_path(name)
+
+    def audio_recording_delete(self, client_id: str, name: str) -> bool:
+        self._ensure_control(client_id)
+        return self._audio.delete_recording(name)
 
     def note_activity(self, ws_or_client: object) -> None:
         """Refresh the control-ownership TTL (heartbeat or set command)."""
@@ -291,9 +354,7 @@ class ReceiverManager:
 
     async def _spectrum_frame(self, frame: bytes) -> None:
         for ws in list(self._spectrum_clients):
-            try:
-                await ws.send_bytes(frame)
-            except Exception:  # noqa: BLE001 - prune dead sockets lazily
+            if not await self._safe_send(ws, ws.send_bytes, frame):
                 self._spectrum_clients.pop(ws, None)
 
     def preset_list(self) -> list[dict]:
@@ -329,6 +390,7 @@ class ReceiverManager:
             "volume": device.af_volume(),
             "level_dbuv": device.level(),
             "sweeping": device.sweeping(),
+            "remote_af_mode": device.remote_af_mode(),
         }
 
     async def poll_once(self) -> dict:
@@ -352,6 +414,7 @@ class ReceiverManager:
             "connected": self._last_connected,
             "scanning": self._busy(),
             "spectrum": self.spectrum_status(),
+            "audio": self.audio_status(),
             "error": error,
             "device": self._device_info,
             "state": state or (self._snapshot or {}).get("state"),
@@ -362,10 +425,20 @@ class ReceiverManager:
 
     async def _broadcast(self, message: dict) -> None:
         for ws in list(self._clients):
-            try:
-                await ws.send_json(message)
-            except Exception:  # noqa: BLE001 - dead clients are pruned lazily
+            if not await self._safe_send(ws, ws.send_json, message):
                 self._clients.pop(ws, None)
+
+    async def _safe_send(self, ws: object, send, *args) -> bool:
+        """Send with a hard timeout; dead peers must never stall producers."""
+        try:
+            await asyncio.wait_for(send(*args), timeout=2.0)
+            return True
+        except Exception:  # noqa: BLE001 - prune on failure or hang
+            try:
+                await ws.close()
+            except Exception:  # noqa: BLE001
+                pass
+            return False
 
     async def _poll_loop(self) -> None:
         while not self._stopped:

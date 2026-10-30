@@ -4,11 +4,11 @@ Modern web-based control software for the Rohde & Schwarz EB200 Miniport
 receiver. The project recovers the receiver's remote-control and measurement
 capabilities behind a browser interface running on Linux.
 
-Status: Phase 4 complete — receiver discovery, tested driver library, web
-application, and a live spectrum/waterfall panel driven by continuous
-documented sweep cycles (binary WebSocket streaming, peak hold, presets,
-CSV export). No IF-panorama/Digi-Scan on this hardware; the spectrum uses
-the trace-buffer path.
+Status: Phase 5 complete — receiver discovery, tested driver library, web
+application, live spectrum/waterfall, and browser remote audio (Web Audio
+playback of the server's UDP audio stream with recording to downloadable
+WAV files). The documented 8 kHz rate is confirmed; earlier 1.67× figure
+was a probe artefact.
 
 ## Repository layout
 

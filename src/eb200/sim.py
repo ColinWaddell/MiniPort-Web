@@ -258,6 +258,8 @@ class StatefulTransport(SimulatedTransport):
         # One-cycle sweep emulation: buffers served once, then consumed.
         self._pending_points = 0
         self._armed_trace: tuple[list[float], list[int]] | None = None
+        # UDP trace registry emulation: up to three destination slots.
+        self._registry: list[dict[str, str | int]] = []
 
     def _arm_sweep(self) -> None:
         """Fill the trace buffers for a one-cycle sweep, like the device."""
@@ -300,8 +302,43 @@ class StatefulTransport(SimulatedTransport):
             return
         head = " ".join(parts[0].split()).upper()
         value = parts[1].strip()
+        if head.startswith("TRACE:UDP"):
+            self._registry_command(head, value)
+            return
         with self._state_lock:
             self._mutate(head, value)
+
+    def _registry_command(self, head: str, value: str) -> None:
+        import re as _re
+
+        entry_match = _re.match(r'"([^"]+)",\s*(\d+)(?:,\s*(.+))?', value)
+        if entry_match is None:
+            return
+        ip, port, tag = (
+            entry_match.group(1),
+            int(entry_match.group(2)),
+            entry_match.group(3),
+        )
+        with self._state_lock:
+            if head.endswith("TAG:ON"):
+                self._registry = [
+                    entry
+                    for entry in self._registry
+                    if not (entry["ip"] == ip and entry["port"] == port)
+                ]
+                self._registry.append(
+                    {"ip": ip, "port": port, "tag": (tag or "").strip()}
+                )
+            elif head.endswith("TAG:OFF"):
+                for entry in self._registry:
+                    if entry["ip"] == ip and entry["port"] == port:
+                        entry["tag"] = ""
+            elif head.endswith("DELETE"):
+                self._registry = [
+                    entry
+                    for entry in self._registry
+                    if not (entry["ip"] == ip and entry["port"] == port)
+                ]
 
     def _mutate(self, head: str, value: str) -> None:
         state = self._state
@@ -359,6 +396,18 @@ class StatefulTransport(SimulatedTransport):
             with self._state_lock:
                 pending = self._pending_points
             return f"{pending}\r\n".encode()
+        if key == "TRACE:UDP?":
+            with self._lock:
+                self.requests.append(cmd)
+            with self._state_lock:
+                entries = list(self._registry)
+            lines = ["DEF", "001", "002", "003"]
+            for index, entry in enumerate(entries[:3]):
+                tag = str(entry.get("tag") or "")
+                lines[1 + index] = (
+                    f'{1 + index:03d} "{entry["ip"]}", {entry["port"]}, {tag[:3]}'
+                )
+            return ("\n".join(lines) + "\r\n").encode("ascii", "replace")
         if key in ("TRACe:DATA? MTRACE".upper(), "TRACe:DATA? ITRACE".upper()):
             with self._lock:
                 self.requests.append(cmd)

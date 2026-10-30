@@ -201,3 +201,49 @@ def test_live_presets(live_api):
         ).status_code
         == 404
     )
+
+
+def test_live_audio_stream_and_recording(live_api):
+    """UDP audio stream + WAV recording against the physical receiver.
+
+    Requires the temporary ufw rule for UDP from the receiver while it
+    runs (docs/protocol-notes.md, host-side note).
+    """
+    live_api.post("/api/control/acquire", json={"client_id": CLIENT})
+    start = live_api.post("/api/audio/start", headers=_headers())
+    assert start.status_code == 200
+    assert start.json()["running"] is True
+
+    deadline = time.monotonic() + 20.0
+    packets = 0
+    while time.monotonic() < deadline:
+        packets = live_api.get("/api/audio/stats").json().get("packets", 0)
+        if packets >= 20:
+            break
+        time.sleep(0.5)
+    stats = live_api.get("/api/audio/stats").json()
+    assert packets >= 20, "no audio packets; check the ufw rule"
+    rate = stats.get("rate_hz")
+    assert rate is None or 7000 <= rate <= 16000
+
+    started = live_api.post("/api/audio/record/start", headers=_headers())
+    assert started.status_code == 200
+    time.sleep(1.8)
+    stopped = live_api.post("/api/audio/record/stop", headers=_headers())
+    assert stopped.status_code == 200
+    name = stopped.json()["name"]
+    assert stopped.json()["samples"] > 100
+
+    download = live_api.get(f"/api/audio/recordings/{name}")
+    assert download.status_code == 200
+    wav = download.content
+    assert wav[:4] == b"RIFF" and len(wav) > 2000
+
+    # Cleanup: delete the recording, restore receiver state.
+    deleted = live_api.delete(f"/api/audio/recordings/{name}", headers=_headers())
+    assert deleted.status_code == 200
+    finished = live_api.post("/api/audio/stop", headers=_headers())
+    assert finished.status_code == 200
+    assert finished.json()["running"] is False
+    state = live_api.get("/api/state").json()["state"]
+    assert state["remote_af_mode"] == 0

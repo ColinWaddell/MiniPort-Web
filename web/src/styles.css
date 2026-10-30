@@ -303,6 +303,18 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 button.danger { border-color: #5a2f2f; color: var(--bad); }
 button.danger:hover:not(:disabled) { border-color: var(--bad); color: var(--bad); }
 .run.stop { border-color: #5a2f2f; color: var(--bad); }
+.rec-flag { color: var(--bad); letter-spacing: 0.08em; font-size: 0.78rem; }
+.switch.on.rec { border-color: var(--bad); color: var(--bad); }
+.recordings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.recordings a { color: var(--blue); }
 .scan-empty {
   color: var(--dim);
   font-size: 0.85rem;
