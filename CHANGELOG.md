@@ -3,6 +3,15 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.1] - 2026-10-30
+
+### Fixed
+
+- Native browser tooltips no longer compete with the in-interface help
+  bubbles: the hover-bubble affordance no longer carries a `title`
+  attribute (screen-reader text kept via aria-label). Verified on the LAN
+  origin: zero native tooltips, our bubble alone on hover.
+
 ## [0.8.0] - 2026-10-30
 
 ### Added

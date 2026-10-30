@@ -165,7 +165,7 @@ export function HelpTip({ term, children }: { term: string; children: ReactNode 
     return <>{children}</>;
   }
   return (
-    <span className="tipword" title={tip}>
+    <span className="tipword" aria-label={tip}>
       {children}
       <span className="bubble" role="tooltip">
         {tip}
