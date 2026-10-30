@@ -90,16 +90,25 @@ still needs an audible/frequency-correlation check in phase 5.
   `AUDIO`, `IFPAN`, `FSCAN`, `MSCAN`, `CW`, `LIST`. Anything else → `-141`.
   The weakmon-era `TRACE:UDP:DEFAULT:TAG:ON` form does **not** exist here
   (`-113`/`-141`).
-- Deregister: `TRACE:UDP:TAG:OFF "<ip>",<port>,<TAG>` then
-  `TRACE:UDP:DELETE "<ip>",<port>`. `DELETE` takes exactly two arguments
-  (`-103` with a third).
+- **`TAG:OFF` does not remove an entry.** Observed: it detaches the tag and
+  leaves/creates a destination entry with an empty tag (`"ip", port, `), and
+  when invoked repeatedly it fills further slots. Treat TAG:OFF as
+  "deactivate", not "unregister".
+- `TRACE:UDP:DELETE "<ip>",<port>` removes **one** entry per call (exactly
+  two arguments; `-103` with a third). Removing several entries requires
+  repeated DELETEs.
 - Registry mutation applies **asynchronously** (~0.2 s): immediately after
   `DELETE`, `TRACE:UDP?` may still show the old list. Allow a settle delay
-  before verifying.
+  before verifying. Slots are consumed across three numbered lines plus
+  `DEF`.
 - The receiver only starts sending once the corresponding measuring mode is
   active. AUDIO additionally requires `SYST:AUD:REM:MODE > 0`. FSCAN/MSCAN/
   CW/LIST/IFPAN tags were silent during standby and still need to be
   exercised from their active modes (phase 4).
+- The AUDIO stream restarts its 16-bit sequence counter when the AF mode is
+  applied (a fresh `SYST:AUD:REM:MODE` write resets the stream). Stream
+  consumers must treat a sequence jump larger than half the 16-bit space as
+  a restart, not as packet loss.
 
 ## Host-side note (this workstation)
 
