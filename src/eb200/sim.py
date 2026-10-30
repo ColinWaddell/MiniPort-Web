@@ -212,6 +212,17 @@ class SimulatedTransport:
         return cls(responses=responses)
 
 
+def _sweep_level(start: int, step: int, index: int, steps: int) -> float:
+    """Deterministic synthetic spectrum: noise floor plus a centre peak."""
+    frequency = start + step * index
+    jitter = ((frequency // max(step, 1)) * 7919) % 31 / 10.0
+    level = -19.0 + jitter
+    distance = abs(index - (steps - 1) / 2)
+    if distance < 3:
+        level += 35.0 - distance * 8.0  # a strong carrier in the band centre
+    return level
+
+
 class StatefulTransport(SimulatedTransport):
     """Simulated transport with a small receiver state machine (tests only).
 
@@ -244,10 +255,31 @@ class StatefulTransport(SimulatedTransport):
             "sweep_step": 100_000,
             "sweep_count": math.inf,
         }
+        # One-cycle sweep emulation: buffers served once, then consumed.
+        self._pending_points = 0
+        self._armed_trace: tuple[list[float], list[int]] | None = None
+
+    def _arm_sweep(self) -> None:
+        """Fill the trace buffers for a one-cycle sweep, like the device."""
+        with self._state_lock:
+            state = {**self._state}
+        if state["sweep_count"] != 1:
+            return
+        start = int(state["sweep_start"])
+        stop = int(state["sweep_stop"])
+        step = int(state["sweep_step"])
+        if stop <= start or step <= 0:
+            return
+        steps = (stop - start) // step + 1
+        levels = [_sweep_level(start, step, index, steps) for index in range(steps)]
+        frequencies = [start + index * step for index in range(steps)]
+        self._armed_trace = (levels, frequencies)
+        self._pending_points = steps + 1  # levels + 9.9E37 terminator
 
     # -- transport API --------------------------------------------------------
 
     def command(self, cmd: str) -> None:
+        self._raise_fault_if_any()
         with self._lock:
             self.requests.append(cmd)
         key = self._key(cmd)
@@ -257,7 +289,11 @@ class StatefulTransport(SimulatedTransport):
             return
         if key == "INIT":
             with self._state_lock:
+                mode = str(self._state["freq_mode"])
+                count = self._state["sweep_count"]
                 self._state["sweeping"] = True
+            if mode.upper().startswith("SWE") and count == 1:
+                self._arm_sweep()
             return
         parts = cmd.strip().split(" ", 1)
         if len(parts) != 2:
@@ -315,9 +351,38 @@ class StatefulTransport(SimulatedTransport):
             return
 
     def query(self, cmd: str, timeout: float | None = None) -> bytes:
+        self._raise_fault_if_any()
+        key = self._key(cmd)
+        if key == "TRACe:POINts? MTRACE".upper():
+            with self._lock:
+                self.requests.append(cmd)
+            with self._state_lock:
+                pending = self._pending_points
+            return f"{pending}\r\n".encode()
+        if key in ("TRACe:DATA? MTRACE".upper(), "TRACe:DATA? ITRACE".upper()):
+            with self._lock:
+                self.requests.append(cmd)
+            with self._state_lock:
+                trace = self._armed_trace
+                pending = self._pending_points
+            if trace is None:
+                raise EB200Protocol("stateful sim has no armed sweep trace")
+            if key.endswith("MTRACE?".upper()) or "MTRACE" in key:
+                if pending == 0:
+                    raise EB200Protocol("stateful sim trace already consumed")
+                levels, _frequencies = trace
+                with self._state_lock:
+                    self._pending_points = 0  # reading consumes the buffer
+                payload = ",".join(f"{level:.1f}" for level in levels) + ",9.9E37"
+                return f"{payload}\r\n".encode()
+            # ITRACE: index/frequency pairs + terminator pair
+            levels, frequencies = trace
+            pairs = ",".join(
+                f"{index},{freq}" for index, freq in enumerate(frequencies)
+            )
+            return f"{pairs},9.9E37,9.9E37\r\n".encode()
         with self._lock:
             self.requests.append(cmd)
-        key = self._key(cmd)
         with self._state_lock:
             state = {**self._state}
         answer = self._answer(key, state)

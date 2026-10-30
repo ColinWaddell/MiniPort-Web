@@ -1,4 +1,4 @@
-import { ApiError, type ScanResponse } from "./types";
+import { ApiError, type Preset, type ScanResponse } from "./types";
 
 const CLIENT_ID_KEY = "miniport-client-id";
 
@@ -61,6 +61,44 @@ export const api = {
       step_hz: stepHz,
       timeout: 60,
     }),
+  spectrumStart: (startHz: number, stopHz: number, stepHz: number) =>
+    post("api/spectrum/start", {
+      start_hz: startHz,
+      stop_hz: stopHz,
+      step_hz: stepHz,
+    }),
+  spectrumStop: () => post("api/spectrum/stop", {}),
+  spectrumResetPeak: () => post("api/spectrum/reset-peak", {}),
+  presets: async () => {
+    const res = await fetch("api/spectrum/presets");
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
+    const data = (await res.json()) as { presets: Preset[] };
+    return data.presets;
+  },
+  presetCreate: (name: string, startHz: number, stopHz: number, stepHz: number) =>
+    post<{ preset: Preset }>("api/spectrum/presets", {
+      name,
+      start_hz: startHz,
+      stop_hz: stopHz,
+      step_hz: stepHz,
+    }),
+  presetDelete: async (id: number) => {
+    const res = await fetch(`api/spectrum/presets/${id}`, {
+      method: "DELETE",
+      headers: headers(),
+    });
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        const payload = (await res.json()) as { detail?: unknown };
+        if (typeof payload.detail === "string") detail = payload.detail;
+      } catch {
+        /* keep statusText */
+      }
+      throw new ApiError(res.status, detail);
+    }
+    return (await res.json()) as { deleted: boolean };
+  },
 };
 
 export async function fetchCapabilities() {

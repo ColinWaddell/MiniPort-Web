@@ -50,9 +50,28 @@ export interface Snapshot {
   ts: number;
   connected: boolean;
   scanning: boolean;
+  spectrum: SpectrumStatus;
   error: string | null;
   device: DeviceInfo | null;
   state: ReceiverState | null;
+}
+
+export interface SpectrumStatus {
+  running: boolean;
+  start_hz?: number;
+  stop_hz?: number;
+  step_hz?: number;
+  points?: number;
+  cycles?: number;
+  last_error?: string | null;
+}
+
+export interface Preset {
+  id: number;
+  name: string;
+  start_hz: number;
+  stop_hz: number;
+  step_hz: number;
 }
 
 export class ApiError extends Error {

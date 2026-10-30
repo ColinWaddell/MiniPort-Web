@@ -119,19 +119,28 @@ def test_invalid_values_map_to_400(api):
     )
 
 
-def test_scan_timeout_maps_to_502(api):
-    _acquire(api)
-    response = api.post(
-        "/api/scan",
-        json={
-            "start_hz": 26_800_000,
-            "stop_hz": 27_800_000,
-            "step_hz": 25_000,
-            "timeout": 0.4,
-        },
-        headers=HEADERS,
-    )
-    assert response.status_code == 502
+def test_scan_error_maps_to_502():
+    from eb200.errors import EB200Timeout
+
+    transport = StatefulTransport()
+    manager = ReceiverManager("10.0.0.240", transport=transport, poll_interval=0.05)
+    app = create_app(manager)
+    with TestClient(app, raise_server_exceptions=False) as api:
+        assert (
+            api.post("/api/control/acquire", json={"client_id": CLIENT}).status_code
+            == 200
+        )
+        transport.inject_fault(EB200Timeout("forced failure"))
+        # scan_sweep tolerates faults while recording state, so enough are
+        # injected to reach the configure/measure phase.
+        for _ in range(12):
+            transport.inject_fault(EB200Timeout("forced failure"))
+        response = api.post(
+            "/api/scan",
+            json={"start_hz": 26_800_000, "stop_hz": 27_800_000, "step_hz": 25_000},
+            headers=HEADERS,
+        )
+        assert response.status_code == 502
 
 
 def test_websocket_state_stream(api):

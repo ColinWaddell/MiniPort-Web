@@ -14,10 +14,13 @@ import asyncio
 import logging
 import math
 import time
+from pathlib import Path
 
 from eb200.device import EB200, ScanResult
 from eb200.errors import EB200Error
 from eb200.transport import DEFAULT_PORT, TCPTransport
+from eb200_server.presets import PresetStore, csv_export
+from eb200_server.spectrum import SpectrumParams, SpectrumService
 
 log = logging.getLogger(__name__)
 
@@ -87,10 +90,16 @@ class ReceiverManager:
         self._device = EB200(self._transport, registry_settle=0.3)
         self._receiver_lock = asyncio.Lock()
         self._clients: dict[object, str] = {}
+        self._spectrum_clients: dict[object, str] = {}
         self._owner_id: str | None = None
         self._owner_seen = 0.0
         self._snapshot: dict | None = None
         self._scanning = False
+        self._last_connected = False
+        self._spectrum: SpectrumService | None = None
+        self._preset_store = PresetStore(
+            Path(__file__).resolve().parents[2] / "data" / "scan-presets.json"
+        )
         self._device_info: dict | None = None
         self._poll_task: asyncio.Task | None = None
         self._info_task: asyncio.Task | None = None
@@ -108,6 +117,8 @@ class ReceiverManager:
 
     async def aclose(self) -> None:
         self._stopped = True
+        if self._spectrum is not None:
+            await self._spectrum.stop()
         for task in (self._poll_task, self._info_task):
             if task is not None:
                 task.cancel()
@@ -130,6 +141,12 @@ class ReceiverManager:
         client_id = self._clients.pop(ws, None)
         if client_id is not None and self._owner_id == client_id:
             self._owner_id = None
+
+    def spectrum_join(self, ws: object, client_id: str) -> None:
+        self._spectrum_clients[ws] = client_id
+
+    def spectrum_leave(self, ws: object) -> None:
+        self._spectrum_clients.pop(ws, None)
 
     def note_activity(self, ws_or_client: object) -> None:
         """Refresh the control-ownership TTL (heartbeat or set command)."""
@@ -184,6 +201,7 @@ class ReceiverManager:
             setter = _SETTERS[kind]
         except KeyError:
             raise ValueError(f"unknown parameter {kind!r}") from None
+        self._spectrum_guard()
         async with self._receiver_lock:
             self._ensure_control(client_id)
             await asyncio.to_thread(setter, self._device, value)
@@ -197,6 +215,7 @@ class ReceiverManager:
         *,
         timeout: float = 30.0,
     ) -> dict:
+        self._spectrum_guard()
         async with self._receiver_lock:
             self._ensure_control(client_id)
             self._scanning = True
@@ -211,6 +230,85 @@ class ReceiverManager:
             finally:
                 self._scanning = False
         return result_to_dict(result)
+
+    # -- spectrum (continuous sweeps) ----------------------------------------------
+
+    def _busy(self) -> bool:
+        if self._scanning:
+            return True
+        return self._spectrum is not None and self._spectrum.running
+
+    def _spectrum_guard(self) -> None:
+        if self._spectrum is not None and self._spectrum.running:
+            raise ControlBusy("receiver busy: spectrum scan is running")
+
+    def spectrum_status(self) -> dict:
+        service = self._spectrum
+        if service is None or service.params is None:
+            return {"running": False}
+        return {
+            "running": service.running,
+            "start_hz": service.params.start_hz,
+            "stop_hz": service.params.stop_hz,
+            "step_hz": service.params.step_hz,
+            "points": service.params.points,
+            "cycles": service.cycle_count,
+            "last_error": service.last_error,
+        }
+
+    async def spectrum_start(self, client_id: str, params: SpectrumParams) -> dict:
+        self._ensure_control(client_id)
+        if self._spectrum is None or not self._spectrum.running:
+            self._spectrum = SpectrumService(self._device, self._receiver_lock)
+            self._spectrum.set_frame_sink(self._spectrum_frame)
+        try:
+            await self._spectrum.start(params)
+        except ValueError as exc:
+            raise ValueError(str(exc)) from None
+        return self.spectrum_status()
+
+    async def spectrum_stop(self, client_id: str) -> dict:
+        self._ensure_control(client_id)
+        if self._spectrum is not None:
+            await self._spectrum.stop()
+        return self.spectrum_status()
+
+    async def spectrum_reset_peak(self, client_id: str) -> dict:
+        self._ensure_control(client_id)
+        if self._spectrum is not None:
+            await self._spectrum.reset_peak()
+        return self.spectrum_status()
+
+    def spectrum_csv(self) -> str:
+        service = self._spectrum
+        if service is None or service.params is None:
+            raise ValueError("spectrum has not run yet")
+        frequencies = [
+            service.params.start_hz + index * service.params.step_hz
+            for index in range(service.params.points)
+        ]
+        return csv_export(frequencies, service.history())
+
+    async def _spectrum_frame(self, frame: bytes) -> None:
+        for ws in list(self._spectrum_clients):
+            try:
+                await ws.send_bytes(frame)
+            except Exception:  # noqa: BLE001 - prune dead sockets lazily
+                self._spectrum_clients.pop(ws, None)
+
+    def preset_list(self) -> list[dict]:
+        return self._preset_store.list()
+
+    def preset_add(self, client_id: str, name: str, params: SpectrumParams) -> dict:
+        self._ensure_control(client_id)
+        params.validate()
+        return self._preset_store.add(
+            name, params.start_hz, params.stop_hz, params.step_hz
+        )
+
+    def preset_delete(self, client_id: str, preset_id: int) -> bool:
+        self._ensure_control(client_id)
+        return self._preset_store.delete(preset_id)
 
     # -- polling / broadcast ------------------------------------------------------
 
@@ -234,23 +332,26 @@ class ReceiverManager:
         }
 
     async def poll_once(self) -> dict:
-        sampling_allowed = not self._scanning
+        sampling_allowed = not self._busy()
         error = None
         state = None
-        connected = False
         if sampling_allowed:
             try:
                 async with self._receiver_lock:
                     state = await asyncio.to_thread(self._sample_state)
-                connected = True
+                self._last_connected = True
             except (EB200Error, OSError) as exc:
                 error = str(exc)
+                self._last_connected = False
                 log.warning("receiver poll failed: %s", exc)
+        # While busy (spectrum running) the last known connectivity stands;
+        # sampling would race the sweep task.
         snapshot = {
             "type": "state",
             "ts": time.time(),
-            "connected": connected,
-            "scanning": self._scanning,
+            "connected": self._last_connected,
+            "scanning": self._busy(),
+            "spectrum": self.spectrum_status(),
             "error": error,
             "device": self._device_info,
             "state": state or (self._snapshot or {}).get("state"),

@@ -141,3 +141,63 @@ def test_live_second_client_lockout(live_api):
     blocked = live_api.post("/api/control/acquire", json={"client_id": "owner-b"})
     assert blocked.status_code == 409
     live_api.post("/api/control/release", json={"client_id": "owner-a"})
+
+
+def test_live_spectrum_cycle(live_api):
+    """Continuous sweep cycles + CSV export against the physical receiver."""
+    live_api.post("/api/control/acquire", json={"client_id": CLIENT})
+    start = live_api.post(
+        "/api/spectrum/start",
+        json={"start_hz": 27_000_000, "stop_hz": 27_200_000, "step_hz": 5_000},
+        headers=_headers(),
+    )
+    assert start.status_code == 200
+    deadline = time.monotonic() + 20.0
+    cycles = 0
+    while time.monotonic() < deadline:
+        spectrum = live_api.get("/api/state").json()["spectrum"]
+        cycles = spectrum.get("cycles", 0)
+        if cycles >= 2:
+            break
+        time.sleep(0.5)
+    assert cycles >= 2, "spectrum did not produce two cycles in time"
+
+    stop = live_api.post("/api/spectrum/stop", headers=_headers())
+    assert stop.status_code == 200
+    assert stop.json()["running"] is False
+
+    export = live_api.get("/api/spectrum/export.csv")
+    assert export.status_code == 200
+    lines = export.text.strip().splitlines()
+    assert lines[0].startswith("timestamp_iso,27000000")
+    assert len(lines) >= 3
+
+    state = live_api.get("/api/state").json()["state"]
+    assert state["freq_mode"] in ("CW", "FIX")
+
+
+def test_live_presets(live_api):
+    created = live_api.post(
+        "/api/spectrum/presets",
+        json={
+            "name": "phase4 test band",
+            "start_hz": 27_000_000,
+            "stop_hz": 27_200_000,
+            "step_hz": 5_000,
+        },
+        headers=_headers(),
+    )
+    assert created.status_code == 200
+    preset = created.json()["preset"]
+    assert (
+        live_api.delete(
+            f"/api/spectrum/presets/{preset['id']}", headers=_headers()
+        ).status_code
+        == 200
+    )
+    assert (
+        live_api.delete(
+            f"/api/spectrum/presets/{preset['id']}", headers=_headers()
+        ).status_code
+        == 404
+    )
