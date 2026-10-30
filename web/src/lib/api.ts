@@ -1,4 +1,4 @@
-import { ApiError, type Preset, type ScanResponse } from "./types";
+import { ApiError, type Preset, type Recording, type ScanResponse } from "./types";
 
 const CLIENT_ID_KEY = "miniport-client-id";
 
@@ -97,6 +97,23 @@ export const api = {
       }
       throw new ApiError(res.status, detail);
     }
+    return (await res.json()) as { deleted: boolean };
+  },
+  audioStart: () => post("api/audio/start", {}),
+  audioStop: () => post("api/audio/stop", {}),
+  record: (action: "start" | "stop") => post(`api/audio/record/${action}`, {}),
+  recordings: async () => {
+    const res = await fetch("api/audio/recordings");
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
+    const data = (await res.json()) as { recordings: Recording[] };
+    return data.recordings;
+  },
+  deleteRecording: async (name: string) => {
+    const res = await fetch(`api/audio/recordings/${name}`, {
+      method: "DELETE",
+      headers: headers(),
+    });
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
     return (await res.json()) as { deleted: boolean };
   },
 };

@@ -45,12 +45,28 @@ export interface ScanResponse {
   restore_errors: string[];
 }
 
+export interface AudioStatus {
+  running: boolean;
+  rate_hz?: number | null;
+  packets?: number;
+  lost?: number;
+  recording?: boolean;
+  recording_name?: string | null;
+}
+
+export interface Recording {
+  name: string;
+  bytes: number;
+  modified: number;
+}
+
 export interface Snapshot {
   type: "state";
   ts: number;
   connected: boolean;
   scanning: boolean;
   spectrum: SpectrumStatus;
+  audio: AudioStatus;
   error: string | null;
   device: DeviceInfo | null;
   state: ReceiverState | null;

@@ -77,9 +77,12 @@ U32:
 Samples start at offset 28, big-endian signed 16-bit, 247 per datagram.
 
 Observed AUDIO throughput at `SYST:AUD:REM:MODE 10` (documented: 8 kHz,
-16 bit, 1ch, 16 kbyte/s): 54 datagrams/s × 247 samples ≈ **13,340 samples/s**
-(≈ 27 kbyte/s payload) — 1.67× the documented rate. The true playback rate
-still needs an audible/frequency-correlation check in phase 5.
+16 bit, 1ch, 16 kbyte/s): ≈ 54 datagrams/s × 247 samples. Two estimates
+exist: a crude phase-1 probe suggested ≈ 13.3 k samples/s (artefact of the
+capture window), while the phase-5 segment-based estimator —
+samples/wall-second over contiguous arrival segments — measures
+**≈ 7,957 Hz, matching the documented 8 kHz**. Trust the estimator;
+playback is self-calibrating either way.
 
 ## TRACE:UDP registry (undocumented subsystem)
 

@@ -8,6 +8,7 @@ import { SquelchPanel } from "./components/SquelchPanel";
 import { VolumePanel } from "./components/VolumePanel";
 import { ScanPanel } from "./components/ScanPanel";
 import { SpectrumPanel } from "./components/SpectrumPanel";
+import { AudioPanel } from "./components/AudioPanel";
 import { ErrorBanner } from "./components/ErrorBanner";
 import { api, clientId, fetchCapabilities } from "./lib/api";
 import { useReceiver } from "./lib/useReceiver";
@@ -149,6 +150,17 @@ export function App() {
             />
           </section>
           <section className="panel panel-wide">
+            <AudioPanel
+              connected={connected}
+              ownsControl={ownsControl}
+              status={
+                snapshot?.audio ?? {
+                  running: false,
+                }
+              }
+            />
+          </section>
+          <section className="panel panel-wide">
             <ScanPanel
               state={state}
               controllable={controllable}
@@ -162,7 +174,7 @@ export function App() {
         </div>
       )}
       <footer className="footer">
-        client {clientId().slice(0, 8)} · MiniPort-Web 0.3.0
+        client {clientId().slice(0, 8)} · MiniPort-Web 0.5.0
       </footer>
     </div>
   );

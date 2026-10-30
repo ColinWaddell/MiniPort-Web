@@ -5,6 +5,7 @@ from __future__ import annotations
 import array
 import socket
 import threading
+import time
 
 from . import binary
 from .errors import EB200Protocol
@@ -46,6 +47,10 @@ class AudioReceiver:
         self._last_seq: int | None = None
         self._running = False
         self._thread: threading.Thread | None = None
+        self._clock_segment = time.monotonic()
+        self._clock_samples = 0
+        self._last_arrival: float | None = None
+        self._segments: list[tuple[float, float]] = []
 
     @property
     def port(self) -> int:
@@ -80,6 +85,32 @@ class AudioReceiver:
                 "samples": self._samples,
                 "dropped_buffered": self._dropped_buffered,
             }
+
+    def effective_rate(self) -> float | None:
+        """Measured samples-per-wall-second of the UDP stream.
+
+        The documented per-mode rates disagree with the observed wire rate,
+        so playback derives the sample rate from the stream itself:
+        contiguous arrivals (gaps under 0.5 s) form segments; the longest
+        segment's samples/second wins. None until enough data arrived.
+        """
+        with self._lock:
+            segments = list(self._segments)
+            now = time.monotonic()
+            duration = now - self._clock_segment
+            if duration >= 1.0 and self._clock_samples >= 100:
+                segments.append((duration, self._clock_samples))
+            if not segments:
+                return None
+        duration, samples = max(segments, key=lambda segment: segment[0])
+        return samples / duration
+
+    def reset_rate(self) -> None:
+        with self._lock:
+            self._clock_segment = time.monotonic()
+            self._clock_samples = 0
+            self._last_arrival = None
+            self._segments = []
 
     def read(self, max_samples: int = 100_000) -> array.array[int]:
         """Move buffered samples into the caller, capped at max_samples."""
@@ -139,3 +170,14 @@ class AudioReceiver:
             self._last_seq = seq
             self._chunks.append(samples)
             self._samples += silence + len(samples)
+            now = time.monotonic()
+            if self._last_arrival is not None and now - self._last_arrival > 0.5:
+                duration = self._last_arrival - self._clock_segment
+                if duration >= 1.0 and self._clock_samples >= 100:
+                    self._segments.append((duration, self._clock_samples))
+                    if len(self._segments) > 20:
+                        self._segments.pop(0)
+                self._clock_segment = now
+                self._clock_samples = 0
+            self._last_arrival = now
+            self._clock_samples += len(samples)

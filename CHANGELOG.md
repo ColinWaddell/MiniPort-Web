@@ -3,6 +3,46 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] - 2026-10-30
+
+### Added
+
+- `AudioService` (`src/eb200_server/audio.py`): owns the UDP audio
+  receiver, engages the undocumented remote-AF path (`SYST:AUD:REM:MODE`
+  + `TRACE:UDP:TAG:ON …,AUDIO` in the weakmon-proven order) and restores
+  the receiver state on stop; measures the stream's wire rate with a
+  segment-based estimator (longest contiguous arrivals win) and serves
+  WAV recordings (16-bit mono, buffered, capped at 64 MB).
+- REST: `/api/audio/start|stop`, `/api/audio/stats`,
+  `/api/audio/record/{start|stop}`, recording list/download/delete.
+- New WebSocket `/ws/audio`: text config/rate messages plus binary
+  chunks of native int16-LE PCM.
+- Frontend `AudioPanel`: LISTEN/STOP with Web Audio playback
+  (AudioBuffer scheduling against the AudioContext clock, ~250 ms jitter
+  buffer, underrun re-anchoring, long-queue chunk dropping), browser
+  listen volume, live stream stats (rate/packets/loss), recording
+  controls with download and delete, and a firewall hint when connected
+  but packetless.
+- `AudioReceiver.effective_rate()`: wire-rate measurement that resolves
+  the phase-1 rate discrepancy — measured ≈ 7,957 Hz for mode 10,
+  matching the documented 8 kHz (the earlier 1.67× figure was a probe
+  artefact; docs corrected).
+- Simulated UDP trace registry inside `StatefulTransport` (TAG:ON/OFF/
+  DELETE semantics as measured live), enabling end-to-end audio service
+  tests without hardware.
+- Dead-WebSocket hardening: every broadcast send runs with a hard 2 s
+  timeout and prunes stuck peers, so a crashed browser can no longer
+  stall the audio/spectrum/state producers (found via the first live
+  audio E2E run, which showed a frozen pump with 97% packet loss).
+
+### Verified
+
+- Browser E2E against the live receiver: LISTEN flows PCM at the
+  measured ~7,957 Hz with 0% loss, RECORD writes a downloadable RIFF
+  WAV, STOP restores remote-AF mode 0 and the registry baseline.
+- Gated live tests for the audio stream, recording download and state
+  restore.
+
 ## [0.4.0] - 2026-10-30
 
 ### Added

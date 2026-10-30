@@ -74,9 +74,12 @@ sequence numbers 164–325 (no loss), GA tag 401, TraceAttribute
 `values=247, byte2=0x77, byte3=0x00, flags=0x40000`, samples big-endian
 int16 from byte 28 (see `protocol-notes.md`).
 
-Caveat: the measured payload rate was ≈ 13,340 samples/s, ≈ 1.67× the
-documented 8 kHz. The playback rate must be validated by ear/correlation
-in phase 5 before trusting either number.
+Caveat corrected in phase 5: the segment-based wire-rate estimator in the
+browser path measures ≈ 7,957 Hz for mode 10 — **the documented 8 kHz is
+correct**. Phase 1's "≈ 13,340 samples/s" figure was an artefact of the
+rough probe (window miscount during burst capture), not receiver
+behaviour. Playback uses the measured rate, and stays pitch-correct even
+if the receiver's cadence changes.
 
 ### UDP trace destinations (TRACE:UDP registry, undocumented)
 
