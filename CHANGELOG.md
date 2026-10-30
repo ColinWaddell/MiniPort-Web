@@ -3,6 +3,31 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.0] - 2026-10-30
+
+### Added
+
+- Waterfall auto-normalizing palette (option "AUTO WATERFALL"): the colour
+  range self-normalizes over a rolling ~20 s percentile window (per-frame
+  5th/95th percentiles of received levels), so faint signals pop out of
+  the noise floor. Band changes reset the statistics window.
+- SENSITIVITY slider (0–100) tightening/loosening the percentile window
+  around the median level; AUTO state + slider persist in localStorage.
+- In MANUAL the waterfall behaves exactly as before and the DISPLAY dBµV
+  inputs are editable; in AUTO they are read-only and show the live
+  computed range (`WaterfallNormalizer` in `web/src/lib/spectrum.ts`;
+  client-only, no server changes).
+
+### Fixed
+
+- WebSocket broadcasts can no longer be frozen by a wedged client: the
+  prune path's `close()` is now bounded by a 1 s timeout — starlette's
+  graceful close could hang forever on a half-dead TCP socket (a crashed
+  browser process), which had stalled the sweep-frame broadcast loop for
+  all clients. Verified live: a wedged state-socket client (12 s of not
+  reading) left a healthy client untouched (36 messages at ~3 Hz, max gap
+  0.4 s).
+
 ## [0.8.1] - 2026-10-30
 
 ### Fixed
