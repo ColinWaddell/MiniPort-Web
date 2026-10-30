@@ -25,7 +25,8 @@ GAIN_READBACK = {"FIX": "FIXed", "F": "FIXed"}
 
 
 @pytest.fixture(scope="module")
-def live_api():
+def live_api(tmp_path_factory):
+    store_dir = tmp_path_factory.mktemp("live-data")
     probe = socket_module.socket()
     probe.settimeout(2.0)
     try:
@@ -44,9 +45,17 @@ def live_api():
     from eb200_server.app import create_app
     from eb200_server.manager import ReceiverManager
 
-    manager = ReceiverManager(HOST, PORT, poll_interval=0.3)
+    manager = ReceiverManager(
+        HOST,
+        PORT,
+        poll_interval=0.3,
+        data_dir=store_dir,
+    )
+    import faulthandler
+
     app = create_app(manager)
     with TestClient(app, raise_server_exceptions=False) as api:
+        faulthandler.dump_traceback_later(70, repeat=True, file=open('/tmp/opencode/teardown-stacks.txt', 'w'))
         yield api
     # fixture teardown: lifespan stops the manager
 
@@ -247,3 +256,82 @@ def test_live_audio_stream_and_recording(live_api):
     assert finished.json()["running"] is False
     state = live_api.get("/api/state").json()["state"]
     assert state["remote_af_mode"] == 0
+
+
+def test_live_presets_apply(live_api):
+    """Receiver preset create/apply/delete against the physical receiver."""
+    live_api.post("/api/control/acquire", json={"client_id": CLIENT})
+    state = live_api.get("/api/state").json()["state"]
+    created = live_api.post(
+        "/api/presets",
+        json={
+            "name": "phase6 spot",
+            "frequency_hz": state["freq_hz"],
+            "demod": state["demod"],
+            "bandwidth_hz": state["bandwidth_hz"],
+        },
+        headers=_headers(),
+    )
+    assert created.status_code == 200
+    preset_id = created.json()["preset"]["id"]
+
+    # detune, then let the preset return the receiver
+    detune = live_api.post(
+        "/api/frequency", json={"hz": 27_500_000}, headers=_headers()
+    )
+    assert detune.status_code == 200
+    assert live_api.get("/api/state").json()["state"]["freq_hz"] == 27_500_000
+    applied = live_api.post(f"/api/presets/{preset_id}/apply", headers=_headers())
+    assert applied.status_code == 200
+    assert live_api.get("/api/state").json()["state"]["freq_hz"] == state["freq_hz"]
+    assert (
+        live_api.delete(f"/api/presets/{preset_id}", headers=_headers()).status_code
+        == 200
+    )
+
+
+def test_live_level_log_and_sweep_job(live_api):
+    """Level logging + a manual sweep job run + export, live."""
+    live_api.post("/api/control/acquire", json={"client_id": CLIENT})
+    assert live_api.post("/api/level-log", json={"enabled": True}).status_code == 200
+    started = live_api.get("/api/level-log").json()["rows"]
+
+    job = live_api.post(
+        "/api/jobs",
+        json={
+            "name": "live monitored band",
+            "kind": "sweep",
+            "params": {
+                "start_hz": 27_000_000,
+                "stop_hz": 27_200_000,
+                "step_hz": 5_000,
+            },
+            "interval_s": 600,
+        },
+        headers=_headers(),
+    )
+    assert job.status_code == 200
+    job_id = job.json()["job"]["id"]
+
+    manual = live_api.post(f"/api/jobs/{job_id}/run", headers=_headers())
+    assert manual.status_code == 200
+    sweep = live_api.get("/api/sweeps").json()["sweeps"][0]
+    export = live_api.get(f"/api/sweeps/{sweep['id']}/export.csv")
+    assert export.status_code == 200
+    assert export.text.startswith("timestamp_iso,frequency_hz,level_dbuv")
+    assert len(export.text.splitlines()) == sweep["points"] + 1
+
+    time.sleep(5.5)  # level logger period (5 s)
+    rows = live_api.get("/api/level-log").json()
+    assert rows["rows"] >= started + 1
+
+    csv = live_api.get("/api/level-log/export.csv")
+    assert csv.status_code == 200
+    live_json = live_api.get("/api/level-log/export.json")
+    assert live_json.status_code == 200 and live_json.json()["samples"]
+
+    assert live_api.post("/api/level-log", json={"enabled": False}).status_code == 200
+    assert (
+        live_api.post(f"/api/jobs/{job_id}/disable", headers=_headers()).status_code
+        == 200
+    )

@@ -9,6 +9,7 @@ import { VolumePanel } from "./components/VolumePanel";
 import { ScanPanel } from "./components/ScanPanel";
 import { SpectrumPanel } from "./components/SpectrumPanel";
 import { AudioPanel } from "./components/AudioPanel";
+import { AutomationPanel } from "./components/AutomationPanel";
 import { ErrorBanner } from "./components/ErrorBanner";
 import { api, clientId, fetchCapabilities } from "./lib/api";
 import { useReceiver } from "./lib/useReceiver";
@@ -161,6 +162,9 @@ export function App() {
             />
           </section>
           <section className="panel panel-wide">
+            <AutomationPanel connected={connected} ownsControl={ownsControl} />
+          </section>
+          <section className="panel panel-wide">
             <ScanPanel
               state={state}
               controllable={controllable}
@@ -174,7 +178,7 @@ export function App() {
         </div>
       )}
       <footer className="footer">
-        client {clientId().slice(0, 8)} · MiniPort-Web 0.5.0
+        client {clientId().slice(0, 8)} · MiniPort-Web 0.6.0
       </footer>
     </div>
   );

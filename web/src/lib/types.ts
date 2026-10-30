@@ -57,7 +57,59 @@ export interface AudioStatus {
 export interface Recording {
   name: string;
   bytes: number;
-  modified: number;
+  duration_s: number;
+  rate_hz: number;
+  ts: number;
+  trigger: string;
+}
+
+export interface Preset {
+  id: number;
+  name: string;
+  kind: string;
+  params: Record<string, number | string>;
+}
+
+export interface Job {
+  id: number;
+  name: string;
+  kind: string;
+  params: Record<string, number | string>;
+  interval_s: number | null;
+  daily: string | null;
+  enabled: boolean;
+  last_run: number | null;
+}
+
+export interface TriggerStatus {
+  armed: boolean;
+  threshold_dbuv: number;
+  duration_s: number;
+  cooldown_s: number;
+  last_triggered: number;
+}
+
+export interface LevelLogStatus {
+  enabled: boolean;
+  period_s: number;
+  rows: number;
+}
+
+export interface JobRun {
+  job_id: number;
+  ts: number;
+  status: string;
+  message: string;
+}
+
+export interface SweepRow {
+  id: number;
+  ts: number;
+  start_hz: number;
+  stop_hz: number;
+  step_hz: number;
+  points: number;
+  path: string;
 }
 
 export interface Snapshot {
@@ -85,9 +137,8 @@ export interface SpectrumStatus {
 export interface Preset {
   id: number;
   name: string;
-  start_hz: number;
-  stop_hz: number;
-  step_hz: number;
+  kind: string; // 'receiver' | 'spectrum'
+  params: Record<string, number | string>;
 }
 
 export class ApiError extends Error {

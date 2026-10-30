@@ -166,7 +166,14 @@ export function AudioPanel({ connected, ownsControl, status }: Props) {
               </a>
               <span className="metric">
                 {" "}
-                ({Math.round(recording.bytes / 1024)} kB)
+                ({Math.round(recording.bytes / 1024)} kB
+                {recording.duration_s
+                  ? ` · ${recording.duration_s.toFixed(1)} s`
+                  : ""}
+                {recording.trigger && recording.trigger !== "manual"
+                  ? ` · ${recording.trigger}`
+                  : ""}
+                )
               </span>
               <button
                 className="link"

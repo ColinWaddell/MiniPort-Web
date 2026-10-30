@@ -134,9 +134,10 @@ export function SpectrumPanel({
   };
 
   const applyPreset = (preset: Preset) => {
-    setStartMhz((preset.start_hz / 1e6).toFixed(4));
-    setStopMhz((preset.stop_hz / 1e6).toFixed(4));
-    setStepKhz((preset.step_hz / 1e3).toFixed(0));
+    const params = preset.params;
+    setStartMhz((Number(params.start_hz) / 1e6).toFixed(4));
+    setStopMhz((Number(params.stop_hz) / 1e6).toFixed(4));
+    setStepKhz((Number(params.step_hz) / 1e3).toFixed(0));
   };
 
   return (
@@ -217,7 +218,9 @@ export function SpectrumPanel({
             </option>
             {presets.map((preset) => (
               <option key={preset.id} value={preset.id}>
-                {preset.name} ({(preset.start_hz / 1e6).toFixed(2)}–{(preset.stop_hz / 1e6).toFixed(2)})
+                {preset.name} (
+                {(Number(preset.params.start_hz) / 1e6).toFixed(2)}–
+                {(Number(preset.params.stop_hz) / 1e6).toFixed(2)})
               </option>
             ))}
           </select>

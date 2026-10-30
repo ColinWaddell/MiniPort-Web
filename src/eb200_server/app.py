@@ -9,6 +9,7 @@ identifying the browser; ownership prevents competing control operations.
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -27,7 +28,7 @@ from pydantic import BaseModel, Field
 from eb200.errors import EB200Error
 from eb200_server.audio import AudioError
 from eb200_server.manager import CAPABILITIES, ControlBusy, ReceiverManager
-from eb200_server.spectrum import SpectrumParams
+from eb200_server.spectrum import SpectrumParams, decode_frame
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +88,50 @@ class PresetCreateRequest(BaseModel):
     start_hz: int = Field(ge=0)
     stop_hz: int = Field(ge=0)
     step_hz: int = Field(gt=0)
+
+
+class ReceiverPresetRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    frequency_hz: int | None = Field(default=None, ge=0)
+    demod: str | None = Field(default=None, min_length=1, max_length=8)
+    bandwidth_hz: int | None = Field(default=None, ge=0)
+
+
+class JobCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    kind: str = Field(pattern="^(sweep|audio-record)$")
+    params: dict
+    interval_s: int | None = Field(default=None, ge=5)
+    daily: str | None = Field(default=None, pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$")
+
+
+class LevelLogRequest(BaseModel):
+    enabled: bool | None = None
+    period_s: float | None = Field(default=None, ge=0.5, le=3600)
+
+
+class TriggerRequest(BaseModel):
+    armed: bool | None = None
+    threshold_dbuv: float | None = None
+    duration_s: float | None = Field(default=None, ge=1, le=600)
+    cooldown_s: float | None = Field(default=None, ge=0, le=3600)
+
+
+def _require_header(header_value: str | None) -> None:
+    if not header_value:
+        raise HTTPException(400, "X-Eb200-Client header required")
+
+
+def _iso(timestamp: float) -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(timestamp))
+
+
+def _attachment(body: str, filename: str) -> Response:
+    return Response(
+        body,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 async def _control_call(coro) -> dict:
@@ -321,7 +366,7 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
 
     @app.get("/api/spectrum/presets")
     async def preset_list() -> dict:
-        return {"presets": manager.preset_list()}
+        return {"presets": manager.presets("spectrum")}
 
     @app.post("/api/spectrum/presets")
     async def preset_create(
@@ -329,9 +374,15 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
     ) -> dict:
         if not x_eb200_client:
             raise HTTPException(400, "X-Eb200-Client header required")
-        params = SpectrumParams(request.start_hz, request.stop_hz, request.step_hz)
+        params = {
+            "start_hz": request.start_hz,
+            "stop_hz": request.stop_hz,
+            "step_hz": request.step_hz,
+        }
         try:
-            result = manager.preset_add(x_eb200_client, request.name, params)
+            result = manager.preset_add(
+                x_eb200_client, "spectrum", request.name, params
+            )
         except ControlBusy as exc:
             raise HTTPException(409, str(exc)) from None
         except ValueError as exc:
@@ -349,6 +400,178 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
         if not deleted:
             raise HTTPException(404, f"preset {preset_id} not found")
         return {"deleted": True}
+
+    # -- automation (phase 6) ------------------------------------------------------
+
+    @app.get("/api/presets")
+    async def receiver_presets() -> dict:
+        return {"presets": manager.presets("receiver")}
+
+    @app.post("/api/presets")
+    async def receiver_preset_create(
+        request: ReceiverPresetRequest, x_eb200_client: str = Header(None)
+    ) -> dict:
+        _require_header(x_eb200_client)
+        state = (manager.last_snapshot() or {}).get("state") or {}
+        params = {
+            "frequency_hz": request.frequency_hz or state.get("freq_hz", 27_260_000),
+            "demod": request.demod or state.get("demod", "AM"),
+            "bandwidth_hz": request.bandwidth_hz or state.get("bandwidth_hz", 15_000),
+        }
+        try:
+            preset = manager.preset_add(
+                x_eb200_client, "receiver", request.name, params
+            )
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+        return {"preset": preset}
+
+    @app.post("/api/presets/{preset_id}/apply")
+    async def receiver_preset_apply(
+        preset_id: int, x_eb200_client: str = Header(None)
+    ) -> dict:
+        _require_header(x_eb200_client)
+        return await _control_call(manager.preset_apply(x_eb200_client, preset_id))
+
+    @app.delete("/api/presets/{preset_id}")
+    async def receiver_preset_delete(
+        preset_id: int, x_eb200_client: str = Header(None)
+    ) -> dict:
+        _require_header(x_eb200_client)
+        try:
+            deleted = manager.preset_delete(x_eb200_client, preset_id)
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        if not deleted:
+            raise HTTPException(404, f"preset {preset_id} not found")
+        return {"deleted": True}
+
+    @app.get("/api/jobs")
+    async def job_list() -> dict:
+        return {"jobs": manager.store.jobs(), "runs": manager.store.recent_runs(30)}
+
+    @app.post("/api/jobs")
+    async def job_create(
+        request: JobCreateRequest, x_eb200_client: str = Header(None)
+    ) -> dict:
+        _require_header(x_eb200_client)
+        try:
+            return {
+                "job": manager.store.add_job(
+                    request.name,
+                    request.kind,
+                    request.params,
+                    interval_s=request.interval_s,
+                    daily=request.daily,
+                )
+            }
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+
+    @app.post("/api/jobs/{job_id}/enable")
+    async def job_enable(job_id: int, x_eb200_client: str = Header(None)) -> dict:
+        _require_header(x_eb200_client)
+        if not manager.store.set_job_enabled(job_id, True):
+            raise HTTPException(404, f"job {job_id} not found")
+        return {"enabled": True}
+
+    @app.post("/api/jobs/{job_id}/disable")
+    async def job_disable(job_id: int, x_eb200_client: str = Header(None)) -> dict:
+        _require_header(x_eb200_client)
+        if not manager.store.set_job_enabled(job_id, False):
+            raise HTTPException(404, f"job {job_id} not found")
+        return {"enabled": False}
+
+    @app.post("/api/jobs/{job_id}/run")
+    async def job_run_now(job_id: int, x_eb200_client: str = Header(None)) -> dict:
+        _require_header(x_eb200_client)
+        job = next((j for j in manager.store.jobs() if j["id"] == job_id), None)
+        if job is None:
+            raise HTTPException(404, f"job {job_id} not found")
+        return {"result": await manager.scheduler_run(job)}
+
+    @app.delete("/api/jobs/{job_id}")
+    async def job_delete(job_id: int, x_eb200_client: str = Header(None)) -> dict:
+        _require_header(x_eb200_client)
+        if not manager.store.delete_job(job_id):
+            raise HTTPException(404, f"job {job_id} not found")
+        return {"deleted": True}
+
+    @app.get("/api/job-runs")
+    async def job_runs(limit: int = 50) -> dict:
+        return {"runs": manager.store.recent_runs(min(limit, 500))}
+
+    @app.get("/api/level-log")
+    async def level_log_status() -> dict:
+        return manager.level_logger().status()
+
+    @app.post("/api/level-log")
+    async def level_log_configure(request: LevelLogRequest) -> dict:
+        try:
+            return manager.level_logger().configure(
+                enabled=request.enabled, period_s=request.period_s
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
+
+    @app.get("/api/level-log/export.csv")
+    async def level_log_export(since: float = 0.0) -> Response:
+        rows = manager.store.levels_since(since)
+        body = "timestamp_iso,frequency_hz,level_dbuv\n" + "\n".join(
+            _iso(r["ts"]) + f",{r['frequency_hz']},{r['level_dbuv']:.1f}" for r in rows
+        )
+        return _attachment(body + "\n", "level-log.csv")
+
+    @app.get("/api/level-log/export.json")
+    async def level_log_export_json(since: float = 0.0) -> dict:
+        return {"samples": manager.store.levels_since(since)}
+
+    @app.get("/api/sweeps")
+    async def sweep_list(limit: int = 100) -> dict:
+        return {"sweeps": manager.store.sweeps(min(limit, 500))}
+
+    @app.get("/api/sweeps/{sweep_id}/export.csv")
+    async def sweep_export_csv(sweep_id: int) -> Response:
+        sweep = manager.store.get_sweep(sweep_id)
+        if sweep is None:
+            raise HTTPException(404, "sweep not found")
+        frequencies = [
+            sweep["start_hz"] + index * sweep["step_hz"]
+            for index in range(sweep["points"])
+        ]
+        levels = decode_frame(Path(sweep["path"]).read_bytes())["levels"]
+        stamp = _iso(sweep["ts"])
+        rows = ["timestamp_iso,frequency_hz,level_dbuv"]
+        for freq, level in zip(frequencies, levels, strict=False):
+            level_text = f"{level:.1f}" if level is not None else ""
+            rows.append(f"{stamp},{freq},{level_text}")
+        return _attachment("\n".join(rows) + "\n", f"sweep-{sweep_id}.csv")
+
+    @app.delete("/api/sweeps/{sweep_id}")
+    async def sweep_delete(sweep_id: int, x_eb200_client: str = Header(None)) -> dict:
+        _require_header(x_eb200_client)
+        deleted = manager.store.delete_sweep(sweep_id, remove_file=True)
+        if not deleted:
+            raise HTTPException(404, "sweep not found")
+        return {"deleted": True}
+
+    @app.get("/api/trigger")
+    async def trigger_status() -> dict:
+        return manager.trigger_recorder().status()
+
+    @app.post("/api/trigger")
+    async def trigger_configure(request: TriggerRequest) -> dict:
+        try:
+            return manager.trigger_recorder().configure(
+                armed=request.armed,
+                threshold_dbuv=request.threshold_dbuv,
+                duration_s=request.duration_s,
+                cooldown_s=request.cooldown_s,
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from None
 
     @app.websocket("/ws/spectrum")
     async def spectrum_socket(ws: WebSocket, client_id: str = ""):

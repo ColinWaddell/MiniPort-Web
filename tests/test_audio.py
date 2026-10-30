@@ -11,6 +11,7 @@ from support import make_audio_datagram
 from eb200.device import EB200
 from eb200.sim import StatefulTransport
 from eb200_server.audio import AudioError, AudioService
+from eb200_server.db import Store
 
 
 async def wait_for_async(predicate, timeout: float = 2.0, poll: float = 0.01) -> bool:
@@ -38,7 +39,10 @@ def test_audio_service_stream_record_restore(tmp_path):
     transport = StatefulTransport()
     device = EB200(transport, registry_settle=0.0)
     sink_frames: list[bytes] = []
-    service = AudioService(device, tmp_path / "recordings", pump_interval=0.01)
+    store = Store(tmp_path / "test.db")
+    service = AudioService(
+        device, tmp_path / "recordings", pump_interval=0.01, store=store
+    )
 
     async def sink(payload: bytes) -> None:
         sink_frames.append(payload)
