@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
 import type { Job, JobRun, LevelLogStatus, SweepRow, TriggerStatus } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   connected: boolean;
@@ -72,7 +73,7 @@ export function AutomationPanel({ connected, ownsControl }: Props) {
 
   const triggerRow = trigger ? (
     <>
-      <h2>SIGNAL-TRIGGERED RECORDING</h2>
+      <h2><HelpTip term="trigger">SIGNAL-TRIGGERED RECORDING</HelpTip></h2>
       <div className="field-row">
         <button
           className={`switch ${trigger.armed ? "on" : ""}`}
@@ -110,7 +111,7 @@ export function AutomationPanel({ connected, ownsControl }: Props) {
 
   const levelRow = levelLog ? (
     <>
-      <h2>LEVEL LOG (SQLite)</h2>
+      <h2><HelpTip term="level_log">LEVEL LOG (SQLite)</HelpTip></h2>
       <div className="field-row">
         <button
           className={`switch ${levelLog.enabled ? "on" : ""}`}
@@ -143,7 +144,7 @@ export function AutomationPanel({ connected, ownsControl }: Props) {
 
   const jobsRow = (
     <>
-      <h2>SCHEDULED JOBS</h2>
+      <h2><HelpTip term="jobs">SCHEDULED JOBS</HelpTip></h2>
       {jobs.length === 0 ? (
         <div className="scan-empty">No jobs yet. Create one below.</div>
       ) : (
@@ -230,7 +231,7 @@ export function AutomationPanel({ connected, ownsControl }: Props) {
           CREATE JOB
         </button>
       </div>
-      <h2>SWEEP HISTORY (server-side job runs)</h2>
+      <h2><HelpTip term="sweeps">SWEEP HISTORY (server-side job runs)</HelpTip></h2>
       {sweeps.length === 0 ? (
         <div className="scan-empty">No stored sweeps yet.</div>
       ) : (

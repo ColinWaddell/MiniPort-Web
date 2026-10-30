@@ -1,4 +1,5 @@
 import type { Capabilities, ReceiverState } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   state: ReceiverState;
@@ -24,7 +25,7 @@ export function ModePanel({
   const presets = BANDWIDTH_PRESETS.filter((hz) => hz <= maxBand);
   return (
     <div className="panel-body">
-      <h2>DEMODOULATOR</h2>
+      <h2><HelpTip term="demodulator">DEMODULATOR</HelpTip></h2>
       <div className="field-row">
         <label>
           MODE
@@ -49,7 +50,7 @@ export function ModePanel({
           AFC {state.afc ? "ON" : "OFF"}
         </button>
       </div>
-      <h2>IF BANDWIDTH</h2>
+      <h2><HelpTip term="bandwidth">IF BANDWIDTH</HelpTip></h2>
       <div className="field-row">
         <label>
           BANDWIDTH Hz

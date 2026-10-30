@@ -1,4 +1,5 @@
 import type { ReceiverState } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   state: ReceiverState;
@@ -9,7 +10,7 @@ interface Props {
 export function VolumePanel({ state, controllable, onVolume }: Props) {
   return (
     <div className="panel-body">
-      <h2>AF VOLUME (receiver loudspeaker)</h2>
+      <h2><HelpTip term="af_volume">AF VOLUME (receiver loudspeaker)</HelpTip></h2>
       <label className="slider">
         VOLUME
         <input

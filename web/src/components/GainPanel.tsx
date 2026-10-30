@@ -1,4 +1,5 @@
 import type { Capabilities, ReceiverState } from "../lib/types";
+import { HelpTip } from "./help";
 
 interface Props {
   state: ReceiverState;
@@ -28,7 +29,7 @@ export function GainPanel({
   ];
   return (
     <div className="panel-body">
-      <h2>GAIN</h2>
+      <h2><HelpTip term="gain">GAIN</HelpTip></h2>
       <div className="field-row">
         <label>
           MODE
@@ -58,7 +59,7 @@ export function GainPanel({
           onChange={(ev) => onGain(Number.parseInt(ev.target.value, 10))}
         />
       </label>
-      <h2>RF ATTENUATOR</h2>
+      <h2><HelpTip term="attenuator">RF ATTENUATOR</HelpTip></h2>
       <div className="field-row">
         <button
           className={`switch ${state.att_auto ? "on" : ""}`}

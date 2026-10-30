@@ -1,3 +1,4 @@
+import { HelpTip } from "./help";
 interface Props {
   levelDbuv: number;
   squelch: boolean;
@@ -13,7 +14,7 @@ export function LevelMeter({ levelDbuv, squelch }: Props) {
   return (
     <div className="meter">
       <div className="meter-head">
-        <span className="meter-label">SIGNAL LEVEL</span>
+        <span className="meter-label"><HelpTip term="level">SIGNAL LEVEL</HelpTip></span>
         <span className="meter-value">{levelDbuv.toFixed(1)} dBµV</span>
         {squelch ? <span className="meter-squelch">SQUELCH ON</span> : null}
       </div>
