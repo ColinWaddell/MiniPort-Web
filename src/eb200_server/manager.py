@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
+import os
 import time
 from pathlib import Path
 
@@ -20,7 +21,9 @@ from eb200.device import EB200, ScanResult
 from eb200.errors import EB200Error
 from eb200.transport import DEFAULT_PORT, TCPTransport
 from eb200_server.audio import AudioService
-from eb200_server.presets import PresetStore, csv_export
+from eb200_server.automation import LevelLogger, Scheduler, TriggerRecorder
+from eb200_server.db import Store
+from eb200_server.presets import csv_export
 from eb200_server.spectrum import SpectrumParams, SpectrumService
 
 log = logging.getLogger(__name__)
@@ -82,6 +85,7 @@ class ReceiverManager:
         *,
         poll_interval: float = 0.3,
         transport: TCPTransport | None = None,
+        data_dir: Path | None = None,
     ) -> None:
         self._host = host
         self._port = port
@@ -99,13 +103,27 @@ class ReceiverManager:
         self._scanning = False
         self._last_connected = False
         self._spectrum: SpectrumService | None = None
+        self._data_dir = data_dir or Path(__file__).resolve().parents[2] / "data"
+        self.settings = {
+            "level_retention_days": int(
+                os.environ.get("EB200_LEVEL_RETENTION_DAYS", "7")
+            ),
+            "sweep_retention_days": int(
+                os.environ.get("EB200_SWEEP_RETENTION_DAYS", "30")
+            ),
+            "recording_retention_days": int(
+                os.environ.get("EB200_RECORDING_RETENTION_DAYS", "30")
+            ),
+        }
+        self._store = Store(self._data_dir / "miniport.db")
         self._audio = AudioService(
             self._device,
-            Path(__file__).resolve().parents[2] / "data" / "recordings",
+            self._data_dir / "recordings",
+            store=self._store,
         )
-        self._preset_store = PresetStore(
-            Path(__file__).resolve().parents[2] / "data" / "scan-presets.json"
-        )
+        self._level_logger = LevelLogger(self._store)
+        self._trigger = TriggerRecorder(self._store)
+        self._scheduler = Scheduler(self._store, self, self._data_dir / "sweeps")
         self._device_info: dict | None = None
         self._poll_task: asyncio.Task | None = None
         self._info_task: asyncio.Task | None = None
@@ -120,9 +138,11 @@ class ReceiverManager:
         self._info_task = asyncio.create_task(
             self._load_device_info(), name="eb200-info"
         )
+        self._scheduler.start()
 
     async def aclose(self) -> None:
         self._stopped = True
+        await self._scheduler.aclose()
         if self._audio is not None and self._audio.running:
             await self._audio.stop()
         if self._spectrum is not None:
@@ -190,6 +210,39 @@ class ReceiverManager:
             await asyncio.to_thread(self._audio.teardown)
         return self._audio.status()
 
+    async def trigger_recording(
+        self,
+        duration: float,
+        *,
+        job_id: int | None = None,
+        trigger: str = "auto",
+    ) -> dict:
+        """Conduct a bounded recording, engaging the audio stream if idle."""
+        loop = asyncio.get_running_loop()
+        ip = self._transport.local_ip
+        engaged = False
+        if not self._audio.running:
+            self._spectrum_guard()
+            async with self._receiver_lock:
+                await loop.run_in_executor(
+                    None, self._audio.prepare, "server:automation", ip
+                )
+            self._audio.set_sink(self._audio_frame)
+            self._audio.begin_pump()
+            engaged = True
+        try:
+            await loop.run_in_executor(
+                None,
+                lambda: self._audio.record_start(trigger=trigger, job_id=job_id),
+            )
+            await asyncio.sleep(duration)
+            return await loop.run_in_executor(None, self._audio.record_stop)
+        finally:
+            if engaged:
+                self._audio.request_stop()
+                async with self._receiver_lock:
+                    await loop.run_in_executor(None, self._audio.teardown)
+
     async def audio_record(self, client_id: str, action: str) -> dict:
         self._ensure_control(client_id)
         if action == "start":
@@ -203,6 +256,10 @@ class ReceiverManager:
 
     def audio_recordings(self) -> list[dict]:
         return self._audio.list_recordings()
+
+    @property
+    def store(self) -> Store:
+        return self._store
 
     def audio_recording_path(self, name: str) -> Path:
         return self._audio.recording_path(name)
@@ -357,19 +414,50 @@ class ReceiverManager:
             if not await self._safe_send(ws, ws.send_bytes, frame):
                 self._spectrum_clients.pop(ws, None)
 
-    def preset_list(self) -> list[dict]:
-        return self._preset_store.list()
+    def scheduler_run(self, job: dict) -> dict:
+        return self._scheduler.run_job_now(job)
 
-    def preset_add(self, client_id: str, name: str, params: SpectrumParams) -> dict:
+    def level_logger(self) -> LevelLogger:
+        return self._level_logger
+
+    def trigger_recorder(self) -> TriggerRecorder:
+        return self._trigger
+
+    # -- presets (SQLite-backed; phase 6) ----------------------------------------
+
+    def presets(self, kind: str) -> list[dict]:
+        return self._store.presets(kind)
+
+    def preset_add(self, client_id: str, kind: str, name: str, params: dict) -> dict:
         self._ensure_control(client_id)
-        params.validate()
-        return self._preset_store.add(
-            name, params.start_hz, params.stop_hz, params.step_hz
-        )
+        if kind == "spectrum":
+            SpectrumParams(
+                int(params["start_hz"]), int(params["stop_hz"]), int(params["step_hz"])
+            ).validate()
+        return self._store.add_preset(kind, name, params)
 
     def preset_delete(self, client_id: str, preset_id: int) -> bool:
         self._ensure_control(client_id)
-        return self._preset_store.delete(preset_id)
+        return self._store.delete_preset(preset_id)
+
+    async def preset_apply(self, client_id: str, preset_id: int) -> dict:
+        kind_rows = self._store.presets("receiver")
+        preset = next((p for p in kind_rows if p["id"] == preset_id), None)
+        if preset is None:
+            raise ValueError(f"receiver preset {preset_id} not found")
+        params = preset["params"]
+        apply_sequence = [
+            ("frequency", int(params["frequency_hz"])),
+            ("demod", str(params.get("demod", "AM"))),
+            ("bandwidth", int(params.get("bandwidth_hz", 15_000))),
+        ]
+        self._spectrum_guard()
+        async with self._receiver_lock:
+            self._ensure_control(client_id)
+            for kind, value in apply_sequence:
+                setter = _SETTERS[kind]
+                await asyncio.to_thread(setter, self._device, value)
+        return {"applied": True, "preset_id": preset_id}
 
     # -- polling / broadcast ------------------------------------------------------
 
@@ -406,6 +494,10 @@ class ReceiverManager:
                 error = str(exc)
                 self._last_connected = False
                 log.warning("receiver poll failed: %s", exc)
+        if state is not None:
+            now = time.time()
+            self._level_logger.ingest(now, state["freq_hz"], state["level_dbuv"])
+            await self._trigger.ingest(now, state["level_dbuv"])
         # While busy (spectrum running) the last known connectivity stands;
         # sampling would race the sweep task.
         snapshot = {

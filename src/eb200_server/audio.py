@@ -19,7 +19,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-import wave
 from pathlib import Path
 
 from eb200.device import EB200
@@ -27,10 +26,61 @@ from eb200.streams import AudioReceiver
 
 log = logging.getLogger(__name__)
 
-# Fallback for the WAV header while no wire measurement exists yet
-# (Phase 1 measured ~13.37 kSamples/s against the documented 8 kHz).
-DEFAULT_WIRE_RATE = 13337
+# Fallback for the WAV header before the first wire measurement exists;
+# phase 5's estimator measures ~8 kHz, matching the documented table.
+DEFAULT_WIRE_RATE = 8000
 MAX_RECORDING_BYTES = 64 * 1024 * 1024
+
+WAV_HEADER_SIZE = 44
+
+
+class WavStreamWriter:
+    """Streaming 16-bit PCM WAV writer; the rate is patched at finish."""
+
+    def __init__(self, path: Path, sample_rate: int, channels: int = 1) -> None:
+        self._path = path
+        self._channels = channels
+        self._frames = 0
+        self._frame_rate = sample_rate
+        self._fh = path.open("wb")
+        self._fh.write(b"\x00" * WAV_HEADER_SIZE)  # patched at finish()
+
+    def write(self, pcm: bytes) -> None:
+        self._fh.write(pcm)
+        self._frames += len(pcm) // (2 * self._channels)
+
+    def finish(self, frame_rate: int) -> int:
+        framerate = int(frame_rate)
+        data_size = self._frames * 2 * self._channels
+        byte_rate = framerate * 2 * self._channels
+        header = (
+            b"RIFF"
+            + (36 + data_size).to_bytes(4, "little")
+            + b"WAVEfmt "
+            + (16).to_bytes(4, "little")
+            + (1).to_bytes(2, "little")
+            + self._channels.to_bytes(2, "little")
+            + framerate.to_bytes(4, "little")
+            + byte_rate.to_bytes(4, "little")
+            + (2 * self._channels).to_bytes(2, "little")
+            + (16).to_bytes(2, "little")
+            + b"data"
+            + data_size.to_bytes(4, "little")
+        )
+        self._fh.flush()
+        self._fh.close()
+        with self._path.open("r+b") as patcher:
+            patcher.seek(0)
+            patcher.write(header)
+        self._frame_rate = framerate
+        return self._frames
+
+    def close_provisional(self) -> None:
+        """Write the header with the provisional rate (crash safety)."""
+        try:
+            self.finish(self._frame_rate)
+        except Exception:  # noqa: BLE001
+            self._fh.close()
 
 
 class AudioError(RuntimeError):
@@ -45,11 +95,13 @@ class AudioService:
         *,
         af_mode: int = 10,
         pump_interval: float = 0.04,
+        store=None,
     ) -> None:
         self._device = device
         self._recordings_dir = recordings_dir
         self._af_mode = af_mode
         self._pump_interval = pump_interval
+        self._store = store
         self._rx: AudioReceiver | None = None
         self._task: asyncio.Task | None = None
         self._stop_requested = asyncio.Event()
@@ -62,8 +114,10 @@ class AudioService:
         self._recording = False
         self._recording_name: str | None = None
         self._recording_started = 0.0
-        self._rec_buffer: list[bytes] = []
         self._rec_bytes = 0
+        self._rec_trigger = "manual"
+        self._rec_job_id: int | None = None
+        self._writer: WavStreamWriter | None = None
         recordings_dir.mkdir(parents=True, exist_ok=True)
 
     # -- lifecycle (sync phases for thread offloading) --------------------------
@@ -86,7 +140,6 @@ class AudioService:
             raise
         self._rx = rx
         self._owner_id = client_id
-        self._rec_buffer = []
         self._rec_bytes = 0
         self._recording_name = None
 
@@ -108,7 +161,18 @@ class AudioService:
         """Stop the receiver and restore the device state."""
         time.sleep(0.15)  # let the pump observe the stop flag and drain
         if self._recording:
-            self.record_stop()
+            if self._writer is not None:
+                self._writer.close_provisional()
+            self._recording = False
+            if self._store is not None:
+                self._store.update_recording(
+                    self._recording_name or "",
+                    bytes_count=self._rec_bytes + 44,
+                    duration=max(0.0, time.time() - self._recording_started),
+                    rate_hz=int(self._last_announced_rate or DEFAULT_WIRE_RATE),
+                )
+            self._recording_name = None
+            self._writer = None
         if self._rx is not None:
             self._rx.stop()
             self._rx = None
@@ -152,11 +216,12 @@ class AudioService:
                 if samples:
                     payload = samples.tobytes()  # native little-endian int16
                     if self._recording:
-                        self._rec_buffer.append(payload)
                         self._rec_bytes += len(payload)
+                        if self._writer is not None:
+                            self._writer.write(payload)
                         if self._rec_bytes >= MAX_RECORDING_BYTES:
                             log.warning(
-                                "recording hit the %d byte cap",
+                                "recording hit the %d byte cap; stopping",
                                 MAX_RECORDING_BYTES,
                             )
                             self.record_stop()
@@ -189,7 +254,13 @@ class AudioService:
 
     # -- recordings -----------------------------------------------------------------
 
-    def record_start(self, client_id: str) -> dict:
+    def record_start(
+        self,
+        client_id: str = "server",
+        *,
+        trigger: str = "manual",
+        job_id: int | None = None,
+    ) -> dict:
         self.require_running()  # guard: the stream must be running
         if self._recording:
             raise AudioError("recording already running")
@@ -200,49 +271,69 @@ class AudioService:
         except Exception:  # noqa: BLE001 - naming may fail without device
             frequency, demod = 0, "UNK"
         name = f"{stamp}_{frequency}{demod}.wav"
+        path = self._recordings_dir / name
+        self._writer = WavStreamWriter(
+            path,
+            int(self._last_announced_rate or DEFAULT_WIRE_RATE),
+        )
         self._recording_name = name
         self._recording_started = time.time()
-        self._rec_buffer = []
         self._rec_bytes = 0
+        self._rec_trigger = trigger
+        self._rec_job_id = job_id
         self._recording = True
+        if self._store is not None:
+            self._store.add_recording(name, str(path), trigger=trigger, job_id=job_id)
         return {"recording": True, "name": name}
 
     def record_stop(self) -> dict:
         if not self._recording:
             raise AudioError("no recording running")
         rate = self._last_announced_rate
-        samples = self._rec_bytes // 2
-        seconds = samples / rate if rate else 0.0
-        path = self._recordings_dir / self._recording_name
+        seconds = 0.0
         framerate = int(round(rate)) if rate else int(DEFAULT_WIRE_RATE)
-        with wave.open(str(path), "wb") as handle:
-            handle.setnchannels(1)
-            handle.setsampwidth(2)
-            handle.setframerate(framerate)
-            handle.writeframes(b"".join(self._rec_buffer))
+        frames = 0
+        if self._writer is not None:
+            frames = self._writer.finish(framerate)
+        duration = time.time() - self._recording_started
+        if rate:
+            seconds = frames / rate
         self._recording = False
         self._recording_name = None
-        self._rec_buffer = []
+        self._rec_bytes = 0
+        if self._store is not None:
+            self._store.update_recording(
+                self._recording.name if False else self._recording_name or "",
+                bytes_count=frames * 2 + 44,
+                duration=round(max(seconds, duration * 0.0), 2) or round(duration, 2),
+                rate_hz=framerate,
+            )
+        writer, self._writer = self._writer, None
+        self._rec_trigger = "manual"
+        self._rec_job_id = None
         return {
             "recording": False,
-            "name": path.name,
-            "samples": samples,
-            "seconds": round(seconds, 2),
+            "name": writer._path.name if writer else "",
+            "samples": frames,
+            "seconds": round(seconds or duration, 2),
             "rate_hz": framerate,
         }
 
     def list_recordings(self) -> list[dict]:
-        entries = []
-        for path in sorted(self._recordings_dir.glob("*.wav")):
-            stat = path.stat()
-            entries.append(
-                {
-                    "name": path.name,
-                    "bytes": stat.st_size,
-                    "modified": stat.st_mtime,
-                }
-            )
-        return entries
+        if self._store is None:
+            return []
+        rows = self._store.recordings()
+        return [
+            {
+                "name": row["name"],
+                "bytes": row["bytes"],
+                "duration_s": row["duration_s"],
+                "rate_hz": row["rate_hz"],
+                "ts": row["ts"],
+                "trigger": row["trigger"],
+            }
+            for row in rows
+        ]
 
     def recording_path(self, name: str) -> Path:
         if "/" in name or "\\" in name or ".." in name:
@@ -255,6 +346,8 @@ class AudioService:
     def delete_recording(self, name: str) -> bool:
         path = self.recording_path(name)
         path.unlink()
+        if self._store is not None:
+            return self._store.delete_recording_row(name)
         return True
 
     # -- status ---------------------------------------------------------------------

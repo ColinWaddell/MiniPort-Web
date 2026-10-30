@@ -3,6 +3,37 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.0] - 2026-10-30
+
+### Added
+
+- SQLite store (`src/eb200_server/db.py`, WAL): presets (receiver +
+  spectrum), scheduled jobs + run log, level-log samples, sweep history
+  (payloads as files referenced by rows), recordings metadata, settings.
+  Affected-row/insert semantics split to keep rowcounts truthful.
+- Automation services (`src/eb200_server/automation.py`):
+  - `LevelLogger`: periodic level samples from the poll hook (no extra
+    receiver traffic), configurable period, settings-backed.
+  - `TriggerRecorder`: automatic WAV recording when the level crosses a
+    configured threshold (armed/cooldown/duration settings-backed).
+  - `Scheduler`: background job runner (sweep cycles stored to `data/sweeps/`,
+    audio recordings) with `interval` or `daily` schedules, run-log and
+    hourly retention (`level`/`sweep`/`recording` days) for unattended
+    operation.
+- Disk-streaming WAV recordings (`WavStreamWriter`): header written at
+  start, rate patched at finish; DB rows carry size/duration/rate/trigger;
+  crash-safe provisional patching.
+- REST automation surface: `/api/presets` (frequency presets + apply),
+  unified `/api/spectrum/presets` (now DB-backed), `/api/jobs`
+  (create/enable/disable/run-now/delete + `/api/job-runs`),
+  `/api/level-log` (configure/status + CSV/JSON export),
+  `/api/sweeps` (+ per-sweep CSV), `/api/trigger` (arm/status).
+- Frontend: `AutomationPanel` (trigger, level logging, scheduled jobs with
+  run-now/delete/enable, sweep history export) and frequency presets in
+  the tuning panel; recordings list now shows duration and trigger.
+- A fresh test data dir everywhere (`ReceiverManager(data_dir=...)`), with
+  live integration fixtures isolated from the repo store.
+
 ## [0.5.0] - 2026-10-30
 
 ### Added

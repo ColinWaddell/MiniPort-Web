@@ -233,6 +233,7 @@ class StatefulTransport(SimulatedTransport):
 
     def __init__(self) -> None:
         super().__init__(responses={}, default=None)
+        self.local_ip = "127.0.0.1"  # transport parity
         self._state_lock = threading.Lock()
         self._state: dict[str, float | int | str | bool] = {
             "frequency": 27_260_000,

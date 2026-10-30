@@ -1,4 +1,4 @@
-import { ApiError, type Preset, type Recording, type ScanResponse } from "./types";
+import { ApiError, type Job, type JobRun, type LevelLogStatus, type Preset, type Recording, type ScanResponse, type SweepRow, type TriggerStatus } from "./types";
 
 const CLIENT_ID_KEY = "miniport-client-id";
 
@@ -115,6 +115,67 @@ export const api = {
     });
     if (!res.ok) throw new ApiError(res.status, res.statusText);
     return (await res.json()) as { deleted: boolean };
+  },
+  // phase 6: automation
+  frequencyPresets: async () => {
+    const res = await fetch("api/presets");
+    if (!res.ok) return [];
+    const data = (await res.json()) as { presets: Preset[] };
+    return data.presets;
+  },
+  createFrequencyPreset: (name: string, frequency_hz: number, demod: string, bandwidth_hz: number) =>
+    post<{ preset: Preset }>("api/presets", {
+      name,
+      frequency_hz,
+      demod,
+      bandwidth_hz,
+    }),
+  applyFrequencyPreset: (id: number) =>
+    post<{ applied: boolean }>(`api/presets/${id}/apply`, {}),
+  deleteFrequencyPreset: async (id: number) => {
+    const res = await fetch(`api/presets/${id}`, { method: "DELETE", headers: headers() });
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
+    return (await res.json()) as { deleted: boolean };
+  },
+  jobs: async () => {
+    const res = await fetch("api/jobs");
+    if (!res.ok) return { jobs: [], runs: [] };
+    return (await res.json()) as { jobs: Job[]; runs: JobRun[] };
+  },
+  createJob: (body: { name: string; kind: string; params: Record<string, number>; interval_s?: number; daily?: string }) =>
+    post<{ job: Job }>("api/jobs", body),
+  jobToggle: (id: number, enable: boolean) =>
+    post<{ enabled: boolean }>(`api/jobs/${id}/${enable ? "enable" : "disable"}`, {}),
+  runJob: (id: number) => post<{ result: unknown }>(`api/jobs/${id}/run`, {}),
+  deleteJob: async (id: number) => {
+    const res = await fetch(`api/jobs/${id}`, { method: "DELETE", headers: headers() });
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
+    return (await res.json()) as { deleted: boolean };
+  },
+  levelLogStatus: async () => {
+    const res = await fetch("api/level-log");
+    if (!res.ok) return { enabled: false, period_s: 5, rows: 0 };
+    return (await res.json()) as LevelLogStatus;
+  },
+  configureLevelLog: (enabled: boolean, period_s?: number) =>
+    post<LevelLogStatus>("api/level-log", { enabled, period_s }),
+  triggerStatus: async () => {
+    const res = await fetch("api/trigger");
+    if (!res.ok)
+      return { armed: false, threshold_dbuv: -30, duration_s: 30, cooldown_s: 60, last_triggered: 0 };
+    return (await res.json()) as TriggerStatus;
+  },
+  configureTrigger: (body: {
+    armed?: boolean;
+    threshold_dbuv?: number;
+    duration_s?: number;
+    cooldown_s?: number;
+  }) => post<TriggerStatus>("api/trigger", body),
+  sweeps: async () => {
+    const res = await fetch("api/sweeps");
+    if (!res.ok) return [];
+    const data = (await res.json()) as { sweeps: SweepRow[] };
+    return data.sweeps;
   },
 };
 
