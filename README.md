@@ -4,8 +4,9 @@ Modern web-based control software for the Rohde & Schwarz EB200 Miniport
 receiver. The project recovers the receiver's remote-control and measurement
 capabilities behind a browser interface running on Linux.
 
-Status: Phase 1 — live receiver discovery and the first driver core. There is
-no web interface yet.
+Status: Phase 2 complete — receiver discovery and a tested driver library
+(`eb200`) covering control, gain, level polling and one-cycle sweep
+acquisition. No web interface yet.
 
 ## Repository layout
 

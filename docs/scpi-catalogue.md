@@ -55,7 +55,32 @@ Raw responses for every command below are in `tests/fixtures/capture/`.
 | Command | Status | Observed response / notes |
 |---|---|---|
 | `SENS:DATA? "VOLT:AC"` | live-ok | ASCII `-18.3` (dBµV) under FORMat:DATA ASC; under PACKed: 2 raw bytes big-endian 1/10 dBµV, no block header |
+| `GCON?` | live-ok | `50` (MGC gain dBµV; documented: -30 max sensitivity … 110 min) |
+| `GCON:MODE?` | live-ok | `AUTO` (read-back uses short forms: `FIX`, `AUTO`) |
 | `DISP:ENAB?` | live-ok | `1` (Hamlib "lock" equivalent) |
+
+## Sweep / scan configuration and acquisition
+
+| Command | Status | Observed response / notes |
+|---|---|---|
+| `FREQ:STARt?` / `FREQ:STOP?` | live-ok | sweep band frequency scan (defaults 20 MHz / 100 MHz) |
+| `SWEep:STEP?` | live-ok | `100000` Hz (sweep step, not the tuning STEP!) |
+| `SWEep:DWELl?`, `SWEep:HOLD:TIME?` | live-ok | `0.000` / `0.000` |
+| `SWEep:COUNt?` | live-ok | `9.9E37` (documented "infinite" marker) |
+| `SWEep:DIRection?` | live-ok | `UP` |
+| `GCON?` / `GCON:MODE?` | live-ok | gain MGC value (dBµV) and mode; see level table |
+| `TRACE:FEED:CONTrol MTRACE,ALWayS` | live-ok | enable storage of measured values in MTRACE |
+| `TRACE:FEED:CONTrol ITRACE,ALWayS` | live-ok | enable storage of step index + frequency in ITRACE |
+| `FREQ:MODE SWEep` + `INIT` | live-ok | starts the sweep; SWEeping condition becomes non-zero |
+| `ABORt` | live-ok | stops the active scan (no reply, per manual) |
+| `FREQ:STARt <v>` while scanning | live-error | `-221,"Settings conflict;Not during scan"` — ABORt first |
+| `TRACe:POINts? MTRACE` during sweep | live-ok | grows with steps; `42` = 41 steps + terminator |
+| `TRACe:DATA? MTRACE` after a full cycle | live-ok | level list per step, dBµV, trailing `9.9E37`terminator; **reading it consumes the buffer** (points → 0) |
+| `TRACe:DATA? ITRACE` after a full cycle | live-ok | index,frequency pairs `0,26800000,1,26825000,…,40,27800000`, terminator pair `9.9E37,9.9E37` |
+| `TRACe:DATA? MTRACE` under PACKed | live-ok | returns ASCII `0` (unusable) — read traces in ASC |
+| `STATus:OPERation:SWEeping:CONDition?` | live-ok | `0` idle in CW; `8` while a sweep is configured/running; `10` seen after re-INIT |
+
+## Undocumented UDP trace registry
 
 ## Trace subsystem
 

@@ -3,6 +3,34 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-10-30
+
+### Added
+
+- Gain control on the `EB200` facade (`gain`, `set_gain`, `gain_mode`,
+  `set_gain_mode`) with documented -30…110 dBµV range validation.
+- Sweep configuration (`sweep_start/stop/step`, count with INFinity
+  handling, dwell, direction), measuring-state control (`initiate`,
+  `abort`, `sweeping`) and `trace_feed_control`.
+- `EB200.scan_sweep(start, stop, step)`: one documented FSCAN sweep cycle
+  read back from the MTRACE/ITRACE trace buffers as per-step levels
+  (dBµV, no-data as NaN) and step frequencies, with best-effort receiver
+  state restore surfaced in `ScanResult.restore_errors`.
+- Live experiment `sweep-fscan` (UDP FSCAN tag trigger matrix - tag accepted
+  but no datagrams on this unit) and `trace-buffer` (documented trace-buffer
+  scan path, captured responses).
+- Unit tests for all new commands plus a simulated scan round-trip and
+  timeout path; integration tests for gain read-modify-restore and one live
+  sweep.
+
+### Verified
+
+- Live: `TRACe:DATA? MTRACE` returns per-step levels with a `9.9E37`
+  terminator and consuming the buffer clears it; `ITRACE` returns
+  step-index/frequency pairs ending in a `9.9E37,9.9E37` terminator pair;
+  sweep band/step/dwell parameters are `-221 Settings conflict` locked
+  while a scan runs.
+
 ## [0.1.0] - 2026-10-30
 
 ### Added
