@@ -3,6 +3,42 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Scientific waterfall: shared frequency axis (x), real time axis (y) and a
+  crosshair readout.
+  - The frequency axis strip below the waterfall covers trace **and**
+    waterfall with the same tick ladder (1‑2‑5 steps) chosen to fit the span;
+    vertical gridlines keep both displays aligned.
+  - The waterfall's time axis labels each row with its actual capture
+    timestamp (HH:MM:SS); seconds‑per‑row comes from the median gap between
+    received frame timestamps, so the axis is honest about sweep cadence.
+  - HEIGHT chips (320/480/640 px, **320 is the new default** — twice the old
+    160 px) and ROW DENSITY chips (1/2 px per sweep frame) control how much
+    time the y axis shows; height/density/palette persist in localStorage.
+  - Waterfall frames now land in a ring buffer (`WaterfallBuffer` +
+    `WaterfallRenderer` in `web/src/lib/waterfall.ts`) instead of pixel
+    scrolling: every frame is exactly one row, history survives height,
+    density, palette and window-resize changes, and the buffer keeps its rows
+    even while the waterfall is hidden.
+  - Crosshair readout on trace and waterfall: frequency, level in dBµV and
+    the capture time (with age) of the row under the pointer; rows from
+    before a band change report their own mapping.
+  - Palettes (EB200, GRAY, VIRIDIS, INFERNO) recolour the whole retained
+    history; a legend bar shows the live colour range.
+  - Dashed tune marker across trace and waterfall; dashed squelch-threshold
+    line that brightens when a signal exceeds it (both display only).
+  - TRACE AVG chips (OFF/3/10): exponential-moving-average video filter for
+    the trace, display only.
+  - WATERFALL CSV exports the retained buffer (timestamp, frequency, level
+    per captured bin); SAVE PNG now composes trace + waterfall + axes plus a
+    parameter caption.
+  - Clicking the spectrum face tunes the receiver to the clicked frequency
+    (when you hold control).
+- Client-only; no server or protocol changes.
+
 ## [0.9.0] - 2026-10-30
 
 ### Added

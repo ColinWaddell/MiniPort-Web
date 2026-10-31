@@ -153,6 +153,8 @@ export function App() {
               scanning={snapshot?.scanning ?? false}
               status={snapshot?.spectrum ?? { running: false }}
               tuneHz={state?.freq_hz ?? null}
+              thresholdDbuv={state?.squelch_threshold_dbuv ?? null}
+              onTune={(hz) => apply(() => api.setFrequency(hz))}
             />
           </section>
           <section className="panel panel-wide">

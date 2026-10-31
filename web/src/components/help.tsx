@@ -45,7 +45,7 @@ export const TIPS: Record<string, string> = {
   reset_peak:
     "Clears the peak-hold trace (dashed line = highest level seen per bin since the sweep started).",
   waterfall:
-    "Scrolling colour map of the levels: time flows downward, colour = level (dark = noise floor, cyan/yellow = strong, red = strongest).",
+    "Scrolling colour map of the levels: time flows downward with capture-time labels, colour = level (dark = noise floor, cyan/yellow = strong, red = strongest). A row = one sweep frame; band changes draw a separator.",
   span_chips:
     "Recentre the sweep band on the receiver's current tune with that total width.",
   step_chips: "Set the sweep step quickly.",
@@ -66,8 +66,24 @@ export const TIPS: Record<string, string> = {
     "Link state between the server and the EB200. The browser keeps working while it is down; nothing is lost except live data.",
   auto_waterfall:
     "Self-normalizing waterfall: the colour range spans the rolling 5th–95th percentile of received levels, so the noise floor expands and faint signals become visible. The window rebuilds whenever the sweep band changes.",
-  sensitivity:
-    "Tightens (higher) or widens (lower) the normalizer's window around the median level: higher makes faint signals pop but amplifies noise too; 50 is neutral.",
+  axis:
+    "Shared frequency axis under the waterfall: the trace and the waterfall map to the same positions. The legend bar under the waterfall shows the colour range in dBµV.",
+  crosshair:
+    "Hover (or touch) the trace or waterfall for a readout of frequency, level and the capture time of the row under the pointer. Clicking the face tunes the receiver to that frequency (when you hold control).",
+  wf_height:
+    "Waterfall record depth in pixels. Taller shows more sweep history; the buffer keeps older rows, so growing the waterfall reveals them again without waiting.",
+  wf_density:
+    "Rows per sweep frame. 2 px paints each sweep bigger; 1 px packs two sweeps into the same space and doubles the visible history.",
+  wf_palette:
+    "Colour map of the waterfall levels. Switching repaints the whole retained history with the current colour range.",
+  avg:
+    "Averages the spectrum trace over recent sweeps (exponential moving average) to steady a noisy floor. Display only — the receiver is untouched.",
+  threshold_line:
+    "Dashed line at the squelch threshold (set in the SQUELCH panel); it brightens while a signal exceeds it. Display only — the receiver's own squelch behaviour is unchanged.",
+  wf_csv:
+    "Downloads the retained waterfall buffer as CSV: timestamp, frequency and level for every captured bin — the raw data behind the picture.",
+  tune_line:
+    "Dashed yellow marker at the receiver's current tune frequency, drawn across trace and waterfall whenever it lies inside the sweep span.",
 };
 
 export interface PanelHelp {
@@ -143,13 +159,22 @@ export const PANEL_HELP: PanelHelp[] = [
       { term: "STEP kHz", text: TIPS.sweep_step },
       { term: "START/STOP SWEEPING", text: TIPS.sweep_control },
       { term: "RESET PEAK", text: TIPS.reset_peak },
+      { term: "FREQUENCY AXIS + LEGEND", text: TIPS.axis },
       { term: "WATERFALL", text: TIPS.waterfall },
+      { term: "height / row density chips", text: TIPS.wf_height },
+      { term: "ROW density", text: TIPS.wf_density },
+      { term: "PALETTE", text: TIPS.wf_palette },
       { term: "SPAN chips", text: TIPS.span_chips },
       { term: "STEP chips", text: TIPS.step_chips },
+      { term: "CROSSHAIR / CLICK", text: TIPS.crosshair },
+      { term: "TUNE LINE", text: TIPS.tune_line },
       { term: "AUTO WATERFALL", text: TIPS.auto_waterfall },
       { term: "SENSITIVITY", text: TIPS.sensitivity },
       { term: "DISPLAY dBµV range", text: TIPS.display_range },
-      { term: "SAVE/CLEAR/FREEZE", text: "Display-only actions: PNG export, waterfall clear, frozen picture — they never touch the receiver." },
+      { term: "AVG chips", text: TIPS.avg },
+      { term: "SQUELCH LINE", text: TIPS.threshold_line },
+      { term: "WATERFALL CSV", text: TIPS.wf_csv },
+      { term: "SAVE/CLEAR/FREEZE", text: "Display-only actions: captioned PNG export (includes the axes), waterfall clear, frozen picture — they never touch the receiver." },
       { term: "PRESETS", text: TIPS.presets },
     ],
   },

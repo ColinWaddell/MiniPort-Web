@@ -49,32 +49,6 @@ function readLevels(data: ArrayBuffer, offset: number, points: number) {
   return levels;
 }
 
-export function levelToColor(
-  level: number | null,
-  min: number,
-  max: number,
-): [number, number, number] {
-  if (level === null) return [18, 20, 26];
-  const t = Math.min(Math.max((level - min) / (max - min), 0), 1);
-  // dark blue → cyan → yellow → red
-  const stops: [number, number, number][] = [
-    [10, 12, 60],
-    [28, 130, 190],
-    [250, 220, 60],
-    [245, 90, 60],
-  ];
-  const pos = t * (stops.length - 1);
-  const index = Math.min(Math.floor(pos), stops.length - 2);
-  const frac = pos - index;
-  const a = stops[index];
-  const b = stops[index + 1];
-  return [
-    Math.round(a[0] + frac * (b[0] - a[0])),
-    Math.round(a[1] + frac * (b[1] - a[1])),
-    Math.round(a[2] + frac * (b[2] - a[2])),
-  ];
-}
-
 export function topPeak(
   levels: (number | null)[],
   startHz: number,
