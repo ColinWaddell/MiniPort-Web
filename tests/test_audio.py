@@ -1,6 +1,7 @@
 """Audio service tests: simulated registry, PCM pump, WAV recording."""
 
 import asyncio
+import json
 import socket as socketlib
 import time
 import wave
@@ -131,3 +132,53 @@ def test_audio_without_stream_has_no_rate(tmp_path):
     device = EB200(StatefulTransport(), registry_settle=0.0)
     service = AudioService(device, tmp_path / "recordings")
     assert service.status() == {"running": False, "recording": False}
+
+
+def test_audio_service_announces_integer_wire_rate(tmp_path):
+    """Wire-rate announcements must carry quantised integers.
+
+    Fractional broadcasts (e.g. 7998.6 Hz) alternating with the status
+    poll's truncated integer made the browser DSP treat every alternation
+    as a rate change and reset faster than its sample buffer could refill:
+    the AF displays stayed dark while audio kept playing.
+    """
+    transport = StatefulTransport()
+    device = EB200(transport, registry_settle=0.0)
+    messages: list[str] = []
+    service = AudioService(device, tmp_path / "recordings", pump_interval=0.01)
+
+    async def sink(payload: bytes) -> None:
+        if payload.startswith(b'{"type"'):
+            messages.append(payload.decode("ascii"))
+
+    async def feed() -> None:
+        sender = socketlib.socket(socketlib.AF_INET, socketlib.SOCK_DGRAM)
+        try:
+            for sequence in range(260):
+                sender.sendto(
+                    make_audio_datagram(sequence, [200, 400]),
+                    ("127.0.0.1", service.rx_port),
+                )
+                await asyncio.sleep(0.01)
+        finally:
+            sender.close()
+
+    async def scenario() -> None:
+        service.set_sink(sink)
+        await service.start("tester", ip="10.0.0.35")
+        await feed()
+        await service.stop()
+
+    asyncio.run(scenario())
+
+    rates = []
+    for message in messages:
+        if '"audio-rate"' in message:
+            payload = json.loads(message)
+            rate = payload["rate"]
+            assert isinstance(rate, int), f"fractional rate announced: {message!r}"
+            rates.append(rate)
+    assert rates, "the pump must measure and announce a wire rate"
+    # two 8 kHz-ish samples per 10 ms datagram lands near 200 samples/s;
+    # the estimate must at least be in that ballpark, not noise
+    assert all(150 < rate < 250 for rate in rates), rates

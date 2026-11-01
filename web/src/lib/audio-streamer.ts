@@ -117,11 +117,14 @@ export class AudioStreamer {
         if (message.type === "audio-config") {
           this.patch({ playing: Boolean(message.running) });
           if (message.rate && message.rate > 1000) {
-            this.rateHz = message.rate;
+            this.rateHz = Math.round(message.rate);
             this.patch({ rateHz: this.rateHz });
           }
         } else if (message.type === "audio-rate" && message.rate) {
-          this.rateHz = message.rate;
+          // the wire measurement can carry fractional Hz; quantise so every
+          // rate source (WebSocket announce, status poll, DSP feed) agrees
+          // and the displays never reset on sub-Hz jitter
+          this.rateHz = Math.round(message.rate);
           this.patch({ rateHz: this.rateHz });
           this.scheduledUntil = 0; // re-anchor the playhead
         }
@@ -173,7 +176,7 @@ export class AudioStreamer {
   /** Server-provided stream statistics, pushed from state snapshots. */
   ingestServerStatus(audio: AudioStatus) {
     if (audio.rate_hz && audio.rate_hz > 1000) {
-      this.rateHz = audio.rate_hz;
+      this.rateHz = Math.round(audio.rate_hz);
     }
     this.patch({
       playing: this.status.playing && Boolean(audio.running),

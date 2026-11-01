@@ -676,7 +676,10 @@ export class AfDsp {
   /** Feed one decoded playback chunk (~25×/s, ~0.1 ms of work). */
   feed(samples: Float32Array, rateHz: number): void {
     if (samples.length === 0) return;
-    if (rateHz !== this.rateHz) this.resetForRate(rateHz);
+    // sub-Hz differences (fractional wire measurement vs quantised status)
+    // are not a real rate change; a reset here clears the ring faster than
+    // it refills and the spectrogram/wavelet displays never recover
+    if (Math.abs(rateHz - this.rateHz) > 0.5) this.resetForRate(rateHz);
     this.ring.append(samples);
     for (let i = 0; i < samples.length; i++) {
       const value = samples[i];

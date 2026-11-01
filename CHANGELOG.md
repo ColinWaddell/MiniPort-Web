@@ -3,6 +3,21 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.10.1] - 2026-11-01
+
+### Fixed
+
+- AF DSP displays (spectrum, spectrogram, wavelet, scope and decoders)
+  blanked about a second after enabling LISTEN and never recovered, while
+  audio kept playing: the wire-rate measurement reached the client with two
+  precisions — a fractional rate on the WebSocket (`audio-rate`, e.g.
+  7998.6 Hz) and a truncated integer in the status polls (7998 Hz) — and the
+  DSP treats any change as a full rebuild, clearing its sample buffer faster
+  than the stream could refill it. The server now rounds the measured rate
+  to an integer and re-announces only when that integer actually changes;
+  the browser quantises every rate source the same way and tolerates
+  sub-Hz jitter without a rebuild.
+
 ## [0.10.0] - 2026-11-01
 
 ### Added

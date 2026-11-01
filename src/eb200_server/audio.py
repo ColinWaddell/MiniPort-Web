@@ -229,9 +229,14 @@ class AudioService:
                         await self._audio_sink(payload)
                 rate = rx.effective_rate()
                 if rate is not None and rate > 0:
+                    rate = round(rate)
+                    # announce only on a change the client must act on; with
+                    # fractional rates a >1 Hz gate re-armed on every segment
+                    # tick and the alternating int()/float() values made the
+                    # client reset its DSP faster than its buffer could refill
                     if (
                         self._last_announced_rate is None
-                        or abs(rate - self._last_announced_rate) > 1.0
+                        or rate != self._last_announced_rate
                     ):
                         self._last_announced_rate = rate
                         await self._announce_rate(rate)
@@ -243,13 +248,13 @@ class AudioService:
             self._running = False
 
     async def _announce_rate(self, rate: float) -> None:
-        await self._audio_sink(f'{{"type":"audio-rate","rate":{rate:.1f}}}'.encode())
+        await self._audio_sink(f'{{"type":"audio-rate","rate":{int(rate)}}}'.encode())
 
     async def _notify_config(self) -> None:
         if self._audio_sink is not None:
             await self._audio_sink(
                 f'{{"type":"audio-config","running":{str(self.running).lower()},'
-                f'"rate":{self._last_announced_rate or 0:.1f}}}'.encode()
+                f'"rate":{int(self._last_announced_rate or 0)}}}'.encode()
             )
 
     # -- recordings -----------------------------------------------------------------
