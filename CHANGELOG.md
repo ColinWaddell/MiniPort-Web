@@ -3,9 +3,33 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.10.0] - 2026-11-01
 
 ### Added
+
+- Client-side DSP displays for the demodulated audio stream, in the
+  REMOTE AUDIO panel while LISTEN is active (`web/src/lib/af-dsp.ts`,
+  `web/src/components/AudioPanel.tsx`; browser-only — no server changes,
+  no extra network traffic, no new dependencies):
+  - AF SPECTRUM trace: 2048-point Hann-FFT of the last ~0.25 s at the
+    measured wire rate (0–4 kHz band for remote AF mode 10), dBFS axis
+    (0 dB = full scale), slow peak-decay.
+  - SCOPE: rise-triggered oscilloscope view of the raw waveform with
+    per-column min/max rendering.
+  - AF spectrogram: scrolling waterfall of the AF spectrum, self-normalizing
+    colour range with the same SENSITIVITY behaviour as the RF waterfall.
+  - Wavelet scalogram: WAVELET scroll view — 48 log-spaced Morlet
+    correlators on a logarithmic 50 Hz–2 kHz axis (direct dot products, not
+    an FFT-based CWT), giving constant-Q rows where CTCSS tones and CW
+    pitches show far more cleanly than the fixed-resolution FFT.
+  - Tone decoders: DTMF digits (Goertzel pair test, ~80 ms hold, twist and
+    selectivity limits), CTCSS sub-audible tone (50-tone list, far-neighbour
+    selectivity, 1 s display hold), CW zero-beat pitch readout (strongest
+    steady 300–3000 Hz tone, median-smoothed).
+  - AF POWER meter: RMS and peak in dBFS of the audio the browser received.
+- All displays are wire-rate-agnostic: the band axis and every view rebuild
+  when the server's measured stream rate changes.
+- Scientific waterfall items (moved from Unreleased):
 
 - Scientific waterfall: shared frequency axis (x), real time axis (y) and a
   crosshair readout.

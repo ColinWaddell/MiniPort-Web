@@ -30,6 +30,18 @@ export const TIPS: Record<string, string> = {
     "Browser playback of the receiver's demodulated audio, streamed from the receiver over UDP via this server. If it connects but no packets arrive, the host firewall needs a rule for UDP from the receiver (shown as a hint).",
   listen_volume:
     "Playback volume in your own browser (Web Audio gain node) — independent of the receiver's AF VOLUME.",
+  af_dsp:
+    "Client-side analysis of the demodulated audio: every sample your browser already receives is processed locally — no server load, no extra traffic. The band shown spans 0 Hz to half the measured wire rate (0–4 kHz at the default remote AF mode).",
+  af_trace:
+    "SPECTRUM: fast Fourier transform of the last ~0.25 s of audio on a dBFS axis (0 dB = full scale), with a slow peak-decay. SCOPE: rise-triggered oscilloscope view of the raw waveform.",
+  af_waterfall:
+    "SPECTROGRAM: scrolling colour map of the AF spectrum, time flows downward. WAVELET: same scrolling display but with constant-Q (Morlet wavelet) analysis on a logarithmic frequency axis — CTCSS tones, CW notes and speech pitches appear as cleaner, longer rows than the fixed-resolution FFT can show.",
+  af_sensitivity:
+    "Tightens (higher) or widens (lower) the AF waterfall's auto colour range around the rolling median; 50 is neutral. Same behaviour as the RF waterfall's slider.",
+  af_meter:
+    "Power of the audio this browser received since the last tick, in dB relative to full scale (dBFS). RMS follows speech/traffic level; PEAK catches transients.",
+  af_decoders:
+    "Local tone analysis on the demodulated audio, indicative rather than certified: DTMF = telephone keypad digits (pairs of tones held ~80 ms); CTCSS = the sub-audible squelch tone a transmitter encodes; CW = the pitch of a detected Morse carrier note, a zero-beat aid. No receiver settings are touched.",
   record:
     "Records the demodulated audio to a 16-bit mono WAV file on the server, listed under RECORDINGS for download or deletion.",
   recordings:
@@ -147,6 +159,12 @@ export const PANEL_HELP: PanelHelp[] = [
     items: [
       { term: "LISTEN", text: TIPS.listen },
       { term: "LISTEN VOLUME", text: TIPS.listen_volume },
+      { term: "AF DSP DISPLAY", text: TIPS.af_dsp },
+      { term: "TRACE chips", text: TIPS.af_trace },
+      { term: "WATERFALL chips", text: TIPS.af_waterfall },
+      { term: "SENSITIVITY (AF)", text: TIPS.af_sensitivity },
+      { term: "AF POWER", text: TIPS.af_meter },
+      { term: "TONE DECODERS", text: TIPS.af_decoders },
       { term: "RECORD", text: TIPS.record },
       { term: "RECORDINGS", text: TIPS.recordings },
     ],

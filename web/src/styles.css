@@ -331,6 +331,47 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); color: var(--bad)
   letter-spacing: 0.1em;
 }
 
+/* AF DSP displays (AudioPanel) */
+.spectrum-canvas.af-trace { height: 190px; }
+.spectrum-canvas.af-scroll { height: 150px; }
+.wf-axis {
+  position: relative;
+  height: 14px;
+  margin: -4px 0 10px;
+}
+.wf-axis span {
+  position: absolute;
+  transform: translateX(-50%);
+  color: var(--dim);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+.af-meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.af-meter .af-meter-bar { flex: 1; min-width: 70px; }
+.af-meter-bar {
+  height: 10px;
+  background: #101620;
+  border: 1px solid var(--panel-edge);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.af-meter-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--accent);
+}
+.af-meter-fill.peak { background: var(--warn); }
+.af-db { min-width: 110px; }
+.af-decoder-value { color: var(--accent); }
+
 .recordings {
   list-style: none;
   margin: 0;

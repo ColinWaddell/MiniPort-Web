@@ -34,6 +34,9 @@ export class AudioStreamer {
   private heartbeat: number | undefined;
 
   onStatus?: (status: StreamerStatus) => void;
+  /** DSP tap: invoked once per decoded chunk with the float samples
+   * (−1…1) and the current wire rate, before playback scheduling. */
+  onSamples?: (samples: Float32Array, rateHz: number) => void;
   private status: StreamerStatus = {
     ws: "connecting",
     rateHz: DEFAULT_RATE,
@@ -149,6 +152,7 @@ export class AudioStreamer {
     for (let i = 0; i < samples; i++) {
       channel[i] = view.getInt16(i * 2, true) / 32768;
     }
+    this.onSamples?.(channel, this.rateHz);
     const now = ctx.currentTime;
     const start = Math.max(this.scheduledUntil, now + MIN_LEAD_S);
     if (start - now > MAX_LATENCY_S) {
