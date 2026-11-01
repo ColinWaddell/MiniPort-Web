@@ -190,6 +190,17 @@ def create_app(manager: ReceiverManager, *, owned_lifespan: bool = True) -> Fast
     async def device_info() -> dict:
         return {"device": manager.device_info, "capabilities": CAPABILITIES}
 
+    @app.post("/api/reconnect")
+    async def device_reconnect() -> dict:
+        try:
+            return await manager.force_reconnect()
+        except ControlBusy as exc:
+            raise HTTPException(409, str(exc)) from None
+        except EB200Error as exc:
+            raise HTTPException(502, f"receiver reported: {exc}") from None
+        except OSError as exc:
+            raise HTTPException(503, f"receiver error: {exc}") from None
+
     @app.get("/api/state")
     async def state() -> dict:
         return await manager.poll_once()

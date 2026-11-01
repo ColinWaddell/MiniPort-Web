@@ -135,6 +135,10 @@ class SimulatedTransport:
         self.connected = True
         return True
 
+    def reset(self) -> None:
+        """Drop-link parity with TCPTransport (simulated link)."""
+        self.connected = False
+
     def query(self, cmd: str, timeout: float | None = None) -> bytes:
         self._record(cmd, timeout)
         self._raise_fault_if_any()

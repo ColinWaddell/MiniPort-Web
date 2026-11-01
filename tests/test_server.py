@@ -98,6 +98,37 @@ def test_ownership_adopts_first_user(api):
     assert response.status_code == 200
 
 
+def test_reconnect_endpoint(api):
+    transport = api.app_state_manager._transport
+    positive = api.post("/api/reconnect")
+    assert positive.status_code == 200
+    data = positive.json()
+    assert data["connected"] is True
+    assert data["device"]["model"] == "EB200"
+
+    # A stale link (receiver powered off/on) is dropped, then re-established.
+    transport.disconnect()
+    data = api.post("/api/reconnect").json()
+    assert data["connected"] is True
+    assert api.get("/api/state").json()["connected"] is True
+
+
+def test_reconnect_refused_while_busy(api):
+    _acquire(api)
+    started = api.post(
+        "/api/spectrum/start",
+        json={"start_hz": 26_800_000, "stop_hz": 27_800_000, "step_hz": 25_000},
+        headers=HEADERS,
+    )
+    assert started.status_code == 200
+    try:
+        busy = api.post("/api/reconnect")
+        assert busy.status_code == 409
+    finally:
+        api.post("/api/spectrum/stop", headers=HEADERS)
+    assert api.post("/api/reconnect").status_code == 200
+
+
 def test_missing_client_header(api):
     assert api.post("/api/frequency", json={"hz": 1_000}).status_code == 400
 

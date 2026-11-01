@@ -182,6 +182,18 @@ class TCPTransport:
         except EB200Connection:
             return False
 
+    def reset(self) -> None:
+        """Drop the current link, if any; the next request connects fresh.
+
+        Companion to :meth:`reconnect_now` for manual re-establishment
+        (e.g. the receiver has been powered off and on again): a stale
+        half-dead socket object would satisfy :attr:`is_connected` and
+        make ``reconnect_now`` return True without proving the link.
+        Thread-safe; a request already holding the old socket fails on
+        it and is handled by the per-request reconnect path.
+        """
+        self._close_socket()
+
     def _ensure_socket_with_timeout(self, connect_timeout: float) -> socket.socket:
         with self._lock:
             if self._sock is not None:

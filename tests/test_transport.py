@@ -92,6 +92,20 @@ def test_timeout_then_recovery_on_next_query(server):
         tr.close()
 
 
+def test_reset_drops_stale_link_and_next_query_reconnects(server):
+    tr = make_transport(server)
+    try:
+        assert wait_for(lambda: server.connection_count >= 1)
+        # A receiver power cycle leaves a half-dead socket object behind;
+        # reset must clear it so reconnect_now cannot no-op on it.
+        tr.reset()
+        assert tr.is_connected is False
+        assert tr.query("*IDN?") == IDN
+        assert server.connection_count >= 2
+    finally:
+        tr.close()
+
+
 def test_reconnect_after_connection_kill(server):
     hits: list[int] = []
     tr = make_transport(server, on_reconnect=lambda: hits.append(1))

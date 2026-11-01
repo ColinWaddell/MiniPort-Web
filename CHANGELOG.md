@@ -37,7 +37,12 @@ All notable changes to this project are documented here. The format follows
     parameter caption.
   - Clicking the spectrum face tunes the receiver to the clicked frequency
     (when you hold control).
-- Client-only; no server or protocol changes.
+- **ATTEMPT CONNECTION** button in the header, shown whenever the server
+  link is healthy but the receiver is offline: it drops any half-dead
+  stale link, makes one bounded reconnect attempt, refreshes the device
+  identification and reports the outcome — for power-cycling the
+  receiver without waiting on the poll loop. Backing endpoint:
+  `POST /api/reconnect` (409 while a spectrum scan holds the receiver).
 
 ## [0.9.0] - 2026-10-30
 

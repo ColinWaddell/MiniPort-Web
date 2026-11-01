@@ -23,6 +23,7 @@ export function App() {
   const [controlNote, setControlNote] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [attempting, setAttempting] = useState(false);
 
   useEffect(() => {
     fetchCapabilities()
@@ -68,6 +69,18 @@ export function App() {
       });
   };
 
+  const attemptReconnect = () => {
+    if (attempting) return;
+    setAttempting(true);
+    api
+      .reconnect()
+      .then(() => setApiError(null))
+      .catch((error: { status: number; message: string }) => {
+        setApiError(error.message);
+      })
+      .finally(() => setAttempting(false));
+  };
+
   return (
     <div className="shell">
       <Header
@@ -76,7 +89,9 @@ export function App() {
         connected={connected}
         ownsControl={ownsControl}
         controlNote={controlNote}
+        attempting={attempting}
         onTakeControl={takeControl}
+        onReconnect={attemptReconnect}
         onHelp={() => setHelpOpen(true)}
       />
       {helpOpen ? <HelpSheet onClose={() => setHelpOpen(false)} /> : null}

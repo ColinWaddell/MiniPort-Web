@@ -158,3 +158,37 @@ Frequency, mode, bandwidth, RF and audio settings unchanged from before the
 session; remote AF mode restored to 0; UDP registry at baseline
 (`DEF\n001\n002\n003`); error queue drained. No `*RST` or non-volatile
 reset was issued at any point.
+
+## Operating observation: level readings depend on AGC state (2026-11-01)
+
+**Context:** Web-application operating session with PMR446 handsets and
+airband listening on the live receiver (same unit as above).
+
+**Finding:** Apparent noise-floor readings are not comparable across
+receiver sessions without recording gain state. During the session,
+`SENS:DATA? "VOLT:AC"` read a dead-flat ~+20 dBµV across 127–132 MHz,
+~+20 dBµV parked on other bands, ~+17 dBµV on 446.068 MHz — versus
++2–3 dBµV in the same region hours earlier and −18 dBµV at discovery.
+The gain readback under `AGC` moved 50 → −14 dBµV during the session,
+coinciding with nearby PTT bursts measuring +91…+109 dBµV. Switching to
+`MGC` with gain ~29 restored audibility; the parked level then read
+−8.4 dBµV (129.575 MHz, AM, 9 kHz, attenuator out).
+
+**Reason (assumed, not verified):** AGC reacts to a strong input and
+remains near minimum afterwards; low RF gain raises the chain-noise
+floor referred to the level detector by tens of dB. Mechanism not
+confirmed against the receiver's internal design.
+
+**Evidence:** level_log rows in `data/miniport.db` 2026-11-01 16:0x–18:0x
+(+2…3 vs +17…24 dBµV in the same band), ws/state gain readbacks
+(50 → −14 → 29), user report of recovery after MGC. Level log stores
+frequency and level only, so historical gain values are not available
+retrospectively.
+
+**Action:** Before interpreting floors or levels from the level log,
+check `gain_mode`/`gain_db` in a live state snapshot. For weak-signal
+listening on a fixed frequency prefer `MGC` with a sane gain (order
+30–50, matching the healthy AGC readback) instead of `AGC`. Keep strong
+local transmitters away from the antenna before floor-sensitive
+measurements; a short PTT burst near the antenna is enough to trigger
+this.

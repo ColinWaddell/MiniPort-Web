@@ -1,4 +1,4 @@
-import { ApiError, type Job, type JobRun, type LevelLogStatus, type Preset, type Recording, type ScanResponse, type SweepRow, type TriggerStatus } from "./types";
+import { ApiError, type DeviceInfo, type Job, type JobRun, type LevelLogStatus, type Preset, type Recording, type ScanResponse, type SweepRow, type TriggerStatus } from "./types";
 
 const CLIENT_ID_KEY = "miniport-client-id";
 
@@ -67,6 +67,8 @@ export const api = {
   setSquelchThreshold: (dbuv: number) => post("api/squelch-threshold", { dbuv }),
   setVolume: (value: number) => post("api/volume", { value }),
   setOperation: (mode: string) => post("api/operation", { mode }),
+  reconnect: () =>
+    post<{ connected: boolean; device: DeviceInfo | null }>("api/reconnect", {}),
   scan: (startHz: number, stopHz: number, stepHz: number) =>
     post<ScanResponse>("api/scan", {
       start_hz: startHz,

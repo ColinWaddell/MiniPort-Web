@@ -8,7 +8,9 @@ interface Props {
   connected: boolean;
   ownsControl: boolean;
   controlNote: string | null;
+  attempting: boolean;
   onTakeControl: () => void;
+  onReconnect: () => void;
   onHelp: () => void;
 }
 
@@ -18,7 +20,9 @@ export function Header({
   connected,
   ownsControl,
   controlNote,
+  attempting,
   onTakeControl,
+  onReconnect,
   onHelp,
 }: Props) {
   const linkTone = connected ? "ok" : ws === "down" ? "bad" : "warn";
@@ -42,6 +46,15 @@ export function Header({
         <span className={`badge badge-${linkTone}`}>
           <span className="led" /> {linkText}
         </span>
+        {!connected && ws !== "down" ? (
+          <button
+            className="badge badge-warn"
+            disabled={attempting}
+            onClick={onReconnect}
+          >
+            {attempting ? "connecting…" : "attempt connection"}
+          </button>
+        ) : null}
         {ownsControl ? (
           <span className="badge badge-ctrl">controls: yours</span>
         ) : (
