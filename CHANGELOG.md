@@ -9,14 +9,16 @@ All notable changes to this project are documented here. The format follows
 
 - AF DSP displays (spectrum, spectrogram, wavelet, scope and decoders)
   blanked about a second after enabling LISTEN and never recovered, while
-  audio kept playing: the wire-rate measurement reached the client with two
-  precisions — a fractional rate on the WebSocket (`audio-rate`, e.g.
-  7998.6 Hz) and a truncated integer in the status polls (7998 Hz) — and the
-  DSP treats any change as a full rebuild, clearing its sample buffer faster
-  than the stream could refill it. The server now rounds the measured rate
-  to an integer and re-announces only when that integer actually changes;
-  the browser quantises every rate source the same way and tolerates
-  sub-Hz jitter without a rebuild.
+  audio kept playing: the wire-rate measurement jitters ±2 Hz per pump tick
+  (arrival-burst quantisation) and was announced on nearly every tick, so
+  the browser DSP treated each announcement as a rate change, clearing its
+  sample buffer (25 per second) far faster than the 8 kHz stream could
+  refill it. The server now rounds the measurement to an integer and
+  re-announces only when it moves ≥ max(3 Hz, 5 %) — far above the
+  estimate's own wander, far below any real mode change; the browser
+  quantises every rate source the same way and the DSP rebuilds only on a
+  genuine ≥1 % rate change, so measurement noise can no longer reset the
+  displays.
 
 ## [0.10.0] - 2026-11-01
 

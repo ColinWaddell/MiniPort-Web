@@ -230,13 +230,20 @@ class AudioService:
                 rate = rx.effective_rate()
                 if rate is not None and rate > 0:
                     rate = round(rate)
-                    # announce only on a change the client must act on; with
-                    # fractional rates a >1 Hz gate re-armed on every segment
-                    # tick and the alternating int()/float() values made the
-                    # client reset its DSP faster than its buffer could refill
+                    # Re-announce only when the estimate moves clear of its
+                    # own wander: the per-tick quotient moves with arrival
+                    # phase (±0.1 % on hardware-clocked receiver streams,
+                    # more under bursty load), and announcing that movement
+                    # reset the client DSP up to dozens of times per second
+                    # — faster than its sample buffer refilled — blanking
+                    # every AF display while audio kept playing. Changes
+                    # that actually need a client rebuild (a source/mode
+                    # switch) are an order of magnitude larger than this
+                    # gate, so nothing real is suppressed.
+                    gate = max(3.0, rate * 0.05)
                     if (
                         self._last_announced_rate is None
-                        or rate != self._last_announced_rate
+                        or abs(rate - self._last_announced_rate) >= gate
                     ):
                         self._last_announced_rate = rate
                         await self._announce_rate(rate)

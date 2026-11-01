@@ -153,13 +153,17 @@ def test_audio_service_announces_integer_wire_rate(tmp_path):
 
     async def feed() -> None:
         sender = socketlib.socket(socketlib.AF_INET, socketlib.SOCK_DGRAM)
+        start = time.monotonic()
         try:
             for sequence in range(260):
+                # anchor each datagram to its nominal slot so the estimator
+                # sees steady spacing, like the receiver's UDP cadence
+                delay = start + sequence * 0.01 - time.monotonic()
+                await asyncio.sleep(max(0.0, delay))
                 sender.sendto(
-                    make_audio_datagram(sequence, [200, 400]),
+                    make_audio_datagram(sequence, [200 + i for i in range(24)]),
                     ("127.0.0.1", service.rx_port),
                 )
-                await asyncio.sleep(0.01)
         finally:
             sender.close()
 
@@ -179,6 +183,10 @@ def test_audio_service_announces_integer_wire_rate(tmp_path):
             assert isinstance(rate, int), f"fractional rate announced: {message!r}"
             rates.append(rate)
     assert rates, "the pump must measure and announce a wire rate"
-    # two 8 kHz-ish samples per 10 ms datagram lands near 200 samples/s;
-    # the estimate must at least be in that ballpark, not noise
-    assert all(150 < rate < 250 for rate in rates), rates
+    # 24 samples per 10 ms datagram ≈ 2400 samples/s; the estimate must at
+    # least be in that ballpark, not noise
+    assert all(2000 < rate < 2800 for rate in rates), rates
+    # the test cadence (asyncio timing) wanders a few percent, so a couple
+    # of gate crossings are legitimate; what must not happen is the pre-fix
+    # chatter of an announcement every pump tick
+    assert len(rates) <= 4, f"announce chatter: {len(rates)} in 2.6 s"

@@ -676,10 +676,18 @@ export class AfDsp {
   /** Feed one decoded playback chunk (~25×/s, ~0.1 ms of work). */
   feed(samples: Float32Array, rateHz: number): void {
     if (samples.length === 0) return;
-    // sub-Hz differences (fractional wire measurement vs quantised status)
-    // are not a real rate change; a reset here clears the ring faster than
-    // it refills and the spectrogram/wavelet displays never recover
-    if (Math.abs(rateHz - this.rateHz) > 0.5) this.resetForRate(rateHz);
+    // rebuild only for a real rate change (a source/mode switch). The wire
+    // measurement jitters ±2 Hz per tick at 8 kHz (arrival-burst
+    // quantisation); treating that as a change clears the ring faster than
+    // the stream refills it and every AF display goes dark while audio
+    // keeps playing. 1% is far below anything audible and well inside the
+    // measurement noise at every supported rate.
+    if (
+      this.rateHz === 0 ||
+      Math.abs(rateHz - this.rateHz) / Math.max(this.rateHz, 1) > 0.01
+    ) {
+      this.resetForRate(rateHz);
+    }
     this.ring.append(samples);
     for (let i = 0; i < samples.length; i++) {
       const value = samples[i];
