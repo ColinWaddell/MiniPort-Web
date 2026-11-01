@@ -155,19 +155,6 @@ class TCPTransport:
         self.local_ip = sock.getsockname()[0]
         return sock
 
-    def _open_socket(self) -> socket.socket:
-        try:
-            sock = socket.create_connection(
-                (self.host, self.port), timeout=self._connect_timeout
-            )
-        except OSError as exc:
-            raise EB200Connection(
-                f"cannot connect to {self.host}:{self.port}: {exc}"
-            ) from exc
-        sock.settimeout(self._timeout)
-        self.local_ip = sock.getsockname()[0]
-        return sock
-
     def reconnect_now(self, connect_timeout: float = 1.5) -> bool:
         """Bounded synchronous (re)connect; safe to call from any thread.
 

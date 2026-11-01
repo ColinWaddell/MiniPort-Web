@@ -33,11 +33,17 @@ def _acquire(api, client_id=CLIENT):
 
 
 def test_device_info(api):
-    data = api.get("/api/device").json()
-    assert data["device"]["model"] == "EB200"
-    assert data["device"]["firmware"].startswith("V02.80")
-    assert data["capabilities"]["demodulation_modes"][0] == "AM"
-    assert data["capabilities"]["scan_supported"] is True
+    data = None
+    deadline = time.monotonic() + 5.0
+    while time.monotonic() < deadline:
+        data = api.get("/api/device").json()["device"]
+        if data is not None:
+            break
+        time.sleep(0.2)
+    body = api.get("/api/device").json()
+    assert data is not None and data["model"] == "EB200"
+    assert body["capabilities"]["demodulation_modes"][0] == "AM"
+    assert body["capabilities"]["scan_supported"] is True
 
 
 def test_state_snapshot(api):

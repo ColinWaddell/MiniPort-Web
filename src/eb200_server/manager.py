@@ -362,18 +362,21 @@ class ReceiverManager:
         Backs the browser's "attempt connection" button: after a receiver
         power cycle a half-dead socket object satisfies ``is_connected``,
         so the link is reset first to guarantee a real end-to-end
-        connect. Refuses while the spectrum sweep holds the receiver.
+        connect. Refuses while the spectrum sweep holds the receiver; it
+        deliberately does **not** take the receiver lock — single SCPI
+        requests are serialised inside the transport, and waiting on the
+        lock would add a stalled poll cycle's worth of latency (up to
+        ~10 s with the receiver unresponsive) to the button press.
         """
         if self._busy():
             raise ControlBusy("receiver busy: spectrum scan is running")
-        async with self._receiver_lock:
-            await asyncio.to_thread(self._transport.reset)
-            connected = await asyncio.to_thread(self._transport.reconnect_now, 3.0)
-            if connected:
-                try:
-                    self._device_info = await asyncio.to_thread(self._load_info_sync)
-                except (EB200Error, OSError):
-                    pass  # identification is best-effort; the poll loop retries
+        await asyncio.to_thread(self._transport.reset)
+        connected = await asyncio.to_thread(self._transport.reconnect_now, 3.0)
+        if connected:
+            try:
+                self._device_info = await asyncio.to_thread(self._load_info_sync)
+            except (EB200Error, OSError):
+                pass  # identification is best-effort; the poll loop retries
         self._last_connected = connected
         return {"connected": connected, "device": self._device_info}
 
